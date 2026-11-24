@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CivicEvents+ - Accessible City Events &amp; Services Portal</title>
+  
+  <!-- Inter Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              600: '#2563eb',
+              700: '#1d4ed8',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+</head>
+<body class="bg-[#F8FAFC] text-[#0F172A] font-sans min-h-screen flex flex-col justify-between">
+
+  <!-- Navbar Placeholder -->
+  <div id="navbar-placeholder"></div>
+
+  <!-- Main Content -->
+  <main class="flex-1">
+
+    <!-- Hero Section (Strictly matching Figma Frame #1:4) -->
+    <section class="py-16 md:py-20 px-4 text-center max-w-5xl mx-auto">
+      <h1 class="text-3xl md:text-5xl font-bold tracking-tight text-slate-900 max-w-3xl mx-auto leading-tight">
+        Discover &amp; Participate in Your City's <br class="hidden sm:inline">Civic Events
+      </h1>
+      <p class="mt-4 text-base md:text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed">
+        Stay engaged with your community through public forums, local celebrations, and essential municipal services.
+      </p>
+
+      <!-- Search & Filters Floating Card -->
+      <div class="mt-10 bg-white border border-slate-200 rounded-2xl shadow-sm p-4 md:p-6 text-left max-w-4xl mx-auto">
+        <form id="filter-form" class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
+          
+          <!-- Keyword input -->
+          <div class="md:col-span-5">
+            <label for="filter-search" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Search events</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+              </span>
+              <input 
+                type="text" 
+                id="filter-search" 
+                placeholder="Event name or keyword..."
+                class="w-full pl-10 pr-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition"
+              >
+            </div>
+          </div>
+
+          <!-- Date range select -->
+          <div class="md:col-span-3">
+            <label for="filter-date" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Date filter</label>
+            <select 
+              id="filter-date" 
+              class="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition cursor-pointer"
+            >
+              <option value="all">All Dates</option>
+              <option value="upcoming" selected>Upcoming Events</option>
+              <option value="this-month">This Month</option>
+              <option value="past">Past Events</option>
+            </select>
+          </div>
+
+          <!-- Location select -->
+          <div class="md:col-span-2">
+            <label for="filter-location" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Location</label>
+            <select 
+              id="filter-location" 
+              class="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition cursor-pointer"
+            >
+              <option value="all">All Locations</option>
+            </select>
+          </div>
+
+          <!-- Submit filter button -->
+          <div class="md:col-span-2">
+            <button 
+              type="submit" 
+              class="w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm rounded-xl shadow-sm transition flex items-center justify-center gap-1.5 cursor-pointer"
+            >
+              <span>Search</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- Events Directory Section -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
+      
+      <!-- Section Header -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 border-b border-slate-200 pb-4">
+        <div>
+          <h2 class="text-2xl font-bold text-slate-900">Upcoming Events</h2>
+          <p class="text-xs text-slate-500 mt-0.5" id="events-count-text">Loading events...</p>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <!-- RBAC: Admin only "+ Create Event" button -->
+          <div id="admin-create-event-wrapper" class="hidden">
+            <button 
+              id="btn-open-create-modal"
+              class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl shadow-sm transition flex items-center gap-2 cursor-pointer"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+              <span>Create Event</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sign in warning banner if not authenticated -->
+      <div id="auth-warning-banner" class="hidden mb-8 p-4 bg-amber-50 border border-amber-200 rounded-2xl flex items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <span class="p-2 bg-amber-100 text-amber-700 rounded-lg">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+          </span>
+          <p class="text-sm text-amber-800">
+            <strong>Guest Mode:</strong> Please <a href="login.html" class="underline font-semibold">sign in</a> to view live events, register, and save your attendance.
+          </p>
+        </div>
+        <a href="login.html" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold rounded-xl transition shrink-0">Sign In</a>
+      </div>
+
+      <!-- Skeleton Loaders -->
+      <div id="events-skeleton" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden p-4 space-y-4 animate-pulse">
+          <div class="bg-slate-200 aspect-video rounded-xl"></div>
+          <div class="h-5 bg-slate-200 rounded w-3/4"></div>
+          <div class="h-4 bg-slate-200 rounded w-1/2"></div>
+          <div class="h-4 bg-slate-200 rounded w-full"></div>
+        </div>
+        <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden p-4 space-y-4 animate-pulse hidden md:block">
+          <div class="bg-slate-200 aspect-video rounded-xl"></div>
+          <div class="h-5 bg-slate-200 rounded w-3/4"></div>
+          <div class="h-4 bg-slate-200 rounded w-1/2"></div>
+          <div class="h-4 bg-slate-200 rounded w-full"></div>
+        </div>
+        <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden p-4 space-y-4 animate-pulse hidden lg:block">
+          <div class="bg-slate-200 aspect-video rounded-xl"></div>
+          <div class="h-5 bg-slate-200 rounded w-3/4"></div>
+          <div class="h-4 bg-slate-200 rounded w-1/2"></div>
+          <div class="h-4 bg-slate-200 rounded w-full"></div>
+        </div>
+      </div>
+
+      <!-- Events Grid Container -->
+      <div id="events-grid" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+
+      <!-- Empty State -->
+      <div id="events-empty" class="hidden py-16 text-center bg-white border border-slate-200 rounded-2xl p-8">
+        <svg class="w-16 h-16 mx-auto text-slate-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+        <h3 class="text-base font-bold text-slate-800">No events found</h3>
+        <p class="text-sm text-slate-500 mt-1">Try adjusting your keyword, date range, or location filters.</p>
+        <button id="btn-reset-filters" class="mt-4 px-4 py-2 text-xs font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-xl transition">
+          Clear Filters
+        </button>
+      </div>
+
+      <!-- Pagination Controls -->
+      <div id="pagination-wrapper" class="hidden mt-12 flex items-center justify-center gap-2">
+        <button id="btn-prev-page" class="px-3.5 py-2 text-sm font-medium border border-slate-200 rounded-xl bg-white hover:bg-slate-50 text-slate-700 disabled:opacity-40 disabled:cursor-not-allowed transition">
+          Previous
+        </button>
+        <div id="pagination-pages" class="flex items-center gap-1.5"></div>
+        <button id="btn-next-page" class="px-3.5 py-2 text-sm font-medium border border-slate-200 rounded-xl bg-white hover:bg-slate-50 text-slate-700 disabled:opacity-40 disabled:cursor-not-allowed transition">
+          Next
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <!-- RBAC: Admin Create / Edit Event Modal -->
+  <div id="event-modal" class="hidden fixed inset-0 z-50 overflow-y-auto">
+    <div class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs transition-opacity" id="modal-backdrop"></div>
+    <div class="flex min-h-full items-center justify-center p-4">
+      <div class="relative bg-white rounded-2xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-200">
+        
+        <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-6">
+          <h3 class="text-lg font-bold text-slate-900" id="modal-title">Create New Civic Event</h3>
+          <button type="button" id="btn-close-modal" class="text-slate-400 hover:text-slate-600 p-1">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+          </button>
+        </div>
+
+        <form id="event-form" class="space-y-4">
+          <input type="hidden" id="event-id" name="id">
+
+          <!-- Title -->
+          <div>
+            <label for="event-title" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Event Title *</label>
+            <input type="text" id="event-title" required placeholder="e.g. Annual City Marathon" class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600 transition">
+          </div>
+
+          <!-- Description -->
+          <div>
+            <label for="event-desc" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Description *</label>
+            <textarea id="event-desc" rows="3" required placeholder="Details about this community event..." class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600 transition"></textarea>
+          </div>
+
+          <!-- Location -->
+          <div>
+            <label for="event-location" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Location *</label>
+            <input type="text" id="event-location" required placeholder="e.g. Riverside Park, Pavilion B" class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600 transition">
+          </div>
+
+          <!-- Starts At & Ends At -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label for="event-starts" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Start Date/Time *</label>
+              <input type="datetime-local" id="event-starts" required class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600 transition">
+            </div>
+            <div>
+              <label for="event-ends" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">End Date/Time *</label>
+              <input type="datetime-local" id="event-ends" required class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600 transition">
+            </div>
+          </div>
+
+          <!-- Image Upload & Preview -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Event Banner Image (Optional)</label>
+            <input type="file" id="event-image-input" accept="image/jpeg,image/png,image/gif" class="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
+            <p class="text-[11px] text-slate-400 mt-1">Accepted: JPG, PNG, GIF (Max 2MB)</p>
+            
+            <!-- Live Preview -->
+            <div id="image-preview-wrapper" class="hidden mt-2 relative rounded-xl overflow-hidden aspect-video border border-slate-200 bg-slate-100">
+              <img id="image-preview" src="" alt="Preview" class="w-full h-full object-cover">
+              <button type="button" id="btn-remove-image" class="absolute top-2 right-2 p-1 bg-black/60 hover:bg-black/80 text-white rounded-md text-xs">Remove</button>
+            </div>
+          </div>
+
+          <!-- Modal Action Buttons -->
+          <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+            <button type="button" id="btn-cancel-modal" class="px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition">
+              Cancel
+            </button>
+            <button type="submit" id="btn-save-event" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl shadow-sm transition flex items-center gap-2">
+              <span id="modal-submit-text">Publish Event</span>
+              <span id="modal-spinner" class="hidden animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer Placeholder -->
+  <div id="footer-placeholder"></div>
+
+  <!-- Scripts -->
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/components.js"></script>
+  <script>
+    $(document).ready(function () {
+      // 1. Initialize Layout components
+      Components.renderNavbar('events');
+      Components.renderDrawer();
+      Components.renderFooter();
+
+      // State
+      let allEvents = [];
+      let filteredEvents = [];
+      let currentPage = 1;
+      const pageSize = 6;
+      let selectedImageFile = null;
+
+      // Check URL query parameters for global search
+      const urlParams = new URLSearchParams(window.location.search);
+      const searchParam = urlParams.get('search');
+      if (searchParam) {
+        $('#filter-search').val(searchParam);
+      }
+
+      // RBAC: Show create event button for admin users only
+      if (Auth.isAdmin()) {
+        $('#admin-create-event-wrapper').removeClass('hidden');
+      }
+
+      // Check if user is logged in
+      if (!Auth.isAuthenticated()) {
+        $('#auth-warning-banner').removeClass('hidden');
+      }
+
+      // 2. Fetch Events from Backend API
+      loadEvents();
+
+      function loadEvents() {
+        $('#events-skeleton').removeClass('hidden');
+        $('#events-grid, #events-empty, #pagination-wrapper').addClass('hidden');
+
+        // Check if token exists
+        if (!Auth.isAuthenticated()) {
+          // Fallback demo events for unauthenticated visitors
+          $('#events-skeleton').addClass('hidden');
+          renderFallbackEvents();
+          return;
+        }
+
+        API.get('/events')
+          .done(function (res) {
+            allEvents = res.data || [];
+            
+            // Populate Location dropdown dynamically from events
+            populateLocations(allEvents);
+
+            // Apply active filters
+            applyFilters();
+          })
+          .fail(function (xhr) {
+            $('#events-skeleton').addClass('hidden');
+            if (xhr.status === 401) {
+              renderFallbackEvents();
+            } else {
+              $('#events-empty').removeClass('hidden').find('h3').text('Error loading events');
+            }
+          });
+      }
+
+      // Populate unique locations
+      function populateLocations(events) {
+        const select = $('#filter-location');
+        select.find('option:not(:first)').remove();
+
+        const locations = [...new Set(events.map(e => e.location).filter(Boolean))];
+        locations.sort().forEach(loc => {
+          select.append(`<option value="${loc}">${loc}</option>`);
+        });
+      }
+
+      // Filter events by Search keyword, Date range, and Location
+      function applyFilters() {
+        const searchTerm = $('#filter-search').val().toLowerCase().trim();
+        const dateFilter = $('#filter-date').val();
+        const locationFilter = $('#filter-location').val();
+        const now = new Date();
+
+        filteredEvents = allEvents.filter(event => {
+          // Keyword match
+          const matchesSearch = !searchTerm || 
+            (event.title && event.title.toLowerCase().includes(searchTerm)) ||
+            (event.description && event.description.toLowerCase().includes(searchTerm)) ||
+            (event.location && event.location.toLowerCase().includes(searchTerm));
+
+          // Location match
+          const matchesLocation = locationFilter === 'all' || event.location === locationFilter;
+
+          // Date match
+          const startDate = new Date(event.starts_at);
+          let matchesDate = true;
+
+          if (dateFilter === 'upcoming') {
+            matchesDate = startDate >= now;
+          } else if (dateFilter === 'past') {
+            matchesDate = startDate < now;
+          } else if (dateFilter === 'this-month') {
+            matchesDate = startDate.getMonth() === now.getMonth() && startDate.getFullYear() === now.getFullYear();
+          }
+
+          // RBAC: regular users only see published events
+          const isAdmin = Auth.isAdmin();
+          const matchesPublished = isAdmin || event.published !== false;
+
+          return matchesSearch && matchesLocation && matchesDate && matchesPublished;
+        });
+
+        currentPage = 1;
+        renderEventsGrid();
+      }
+
+      // Render event cards to grid
+      function renderEventsGrid() {
+        $('#events-skeleton').addClass('hidden');
+        const grid = $('#events-grid');
+        grid.empty();
+
+        if (filteredEvents.length === 0) {
+          $('#events-empty').removeClass('hidden');
+          $('#events-grid, #pagination-wrapper').addClass('hidden');
+          $('#events-count-text').text('0 events available');
+          return;
+        }
+
+        $('#events-empty').addClass('hidden');
+        grid.removeClass('hidden');
+        $('#events-count-text').text(`Showing ${filteredEvents.length} event${filteredEvents.length === 1 ? '' : 's'}`);
+
+        // Pagination slice
+        const startIndex = (currentPage - 1) * pageSize;
+        const pageEvents = filteredEvents.slice(startIndex, startIndex + pageSize);
+        const isAdmin = Auth.isAdmin();
+        const isLoggedIn = Auth.isAuthenticated();
+
+        pageEvents.forEach(event => {
+          // Date formatting
+          const dateObj = new Date(event.starts_at);
+          const monthStr = dateObj.toLocaleDateString(undefined, { month: 'short' }).toUpperCase();
+          const dayNum = dateObj.getDate();
+          const timeStr = dateObj.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+          
+          // Image resolution: backend metadata URL or civic placeholder
+          let imageUrl = 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=800&q=80';
+          if (event.metadata && event.metadata.image_url) {
+            imageUrl = event.metadata.image_url;
+          }
+
+          const card = $(`
+            <article class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs hover:shadow-md transition flex flex-col justify-between group">
+              <div>
+                <!-- 16:9 Image container with Date Badge -->
+                <div class="relative aspect-video w-full overflow-hidden bg-slate-100">
+                  <img src="${imageUrl}" alt="${event.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                  <div class="absolute top-3 left-3 bg-white/95 backdrop-blur-xs border border-slate-100 text-slate-900 rounded-xl px-2.5 py-1 text-center shadow-xs">
+                    <span class="block text-[10px] font-bold tracking-wider text-blue-600">${monthStr}</span>
+                    <span class="block text-base font-extrabold leading-tight">${dayNum}</span>
+                  </div>
+                </div>
+
+                <!-- Content -->
+                <div class="p-5">
+                  <div class="flex items-center gap-1.5 text-xs text-slate-500 mb-2">
+                    <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <span>${dateObj.toLocaleDateString(undefined, { weekday: 'short' })}, ${timeStr}</span>
+                  </div>
+
+                  <h3 class="text-base font-bold text-slate-900 line-clamp-1 group-hover:text-blue-600 transition">
+                    <a href="event-detail.html?id=${event.id}">${event.title}</a>
+                  </h3>
+
+                  <div class="flex items-center gap-1.5 text-xs text-slate-600 mt-2">
+                    <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path></svg>
+                    <span class="truncate">${event.location || 'Civic Center'}</span>
+                  </div>
+
+                  <p class="text-xs text-slate-500 mt-2.5 line-clamp-2 leading-relaxed">
+                    ${event.description || 'Join residents for this community event in Civic Hills.'}
+                  </p>
+                </div>
+              </div>
+
+              <!-- Card Action Footer -->
+              <div class="p-5 pt-0 border-t border-slate-100 mt-4 flex items-center justify-between gap-2">
+                <a 
+                  href="event-detail.html?id=${event.id}" 
+                  class="flex-1 py-2 px-3 text-center text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-slate-100 rounded-xl transition border border-slate-200"
+                >
+                  View Details
+                </a>
+
+                <!-- Register Button (for logged-in users) -->
+                ${isLoggedIn ? `
+                  <button 
+                    class="btn-quick-register py-2 px-3 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition shadow-xs cursor-pointer"
+                    data-id="${event.id}"
+                  >
+                    Register
+                  </button>
+                ` : ''}
+
+                <!-- RBAC: Admin Edit & Delete buttons -->
+                ${isAdmin ? `
+                  <div class="flex items-center gap-1">
+                    <button 
+                      class="btn-edit-event p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition"
+                      data-id="${event.id}"
+                      title="Edit Event"
+                    >
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                    </button>
+                    <button 
+                      class="btn-delete-event p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
+                      data-id="${event.id}"
+                      title="Delete Event"
+                    >
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    </button>
+                  </div>
+                ` : ''}
+              </div>
+            </article>
+          `);
+
+          grid.append(card);
+        });
+
+        renderPagination();
+      }
+
+      // Render Pagination Buttons
+      function renderPagination() {
+        const totalPages = Math.ceil(filteredEvents.length / pageSize);
+        if (totalPages <= 1) {
+          $('#pagination-wrapper').addClass('hidden');
+          return;
+        }
+
+        $('#pagination-wrapper').removeClass('hidden');
+        $('#btn-prev-page').prop('disabled', currentPage === 1);
+        $('#btn-next-page').prop('disabled', currentPage === totalPages);
+
+        const pagesContainer = $('#pagination-pages');
+        pagesContainer.empty();
+
+        for (let i = 1; i <= totalPages; i++) {
+          const isCurrent = i === currentPage;
+          const pageBtn = $(`
+            <button class="w-9 h-9 rounded-xl text-sm font-semibold transition ${isCurrent ? 'bg-blue-600 text-white shadow-xs' : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'}">
+              ${i}
+            </button>
+          `);
+          pageBtn.on('click', function () {
+            currentPage = i;
+            renderEventsGrid();
+            window.scrollTo({ top: 400, behavior: 'smooth' });
+          });
+          pagesContainer.append(pageBtn);
+        }
+      }
+
+      // Pagination events
+      $('#btn-prev-page').on('click', function () {
+        if (currentPage > 1) {
+          currentPage--;
+          renderEventsGrid();
+        }
+      });
+
+      $('#btn-next-page').on('click', function () {
+        const totalPages = Math.ceil(filteredEvents.length / pageSize);
+        if (currentPage < totalPages) {
+          currentPage++;
+          renderEventsGrid();
+        }
+      });
+
+      // Filter submit listener
+      $('#filter-form').on('submit', function (e) {
+        e.preventDefault();
+        applyFilters();
+      });
+
+      $('#filter-date, #filter-location').on('change', function () {
+        applyFilters();
+      });
+
+      $('#btn-reset-filters').on('click', function () {
+        $('#filter-search').val('');
+        $('#filter-date').val('all');
+        $('#filter-location').val('all');
+        applyFilters();
+      });
+
+      // Quick event registration (logged in user)
+      $(document).on('click', '.btn-quick-register', function () {
+        const eventId = $(this).data('id');
+        const user = Auth.getUser();
+
+        if (!user) {
+          window.location.href = 'login.html';
+          return;
+        }
+
+        const btn = $(this);
+        btn.prop('disabled', true).text('Registering...');
+
+        API.post('/event-registrations/register', { event_id: eventId, user_id: user.id })
+          .done(function () {
+            Components.showToast('Successfully registered for event!', 'success');
+            btn.removeClass('bg-blue-600 hover:bg-blue-700')
+               .addClass('bg-emerald-600')
+               .text('Registered ✓');
+          })
+          .fail(function (xhr) {
+            btn.prop('disabled', false).text('Register');
+            const msg = (xhr.responseJSON && xhr.responseJSON.message) || 'Already registered or failed to register.';
+            Components.showToast(msg, 'error');
+          });
+      });
+
+      // RBAC: Admin delete event
+      $(document).on('click', '.btn-delete-event', function () {
+        const eventId = $(this).data('id');
+        if (confirm('Are you sure you want to delete this event? This action cannot be undone.')) {
+          API.delete(`/events/${eventId}`)
+            .done(function () {
+              Components.showToast('Event deleted successfully', 'success');
+              loadEvents();
+            })
+            .fail(function () {
+              Components.showToast('Failed to delete event', 'error');
+            });
+        }
+      });
+
+      // RBAC: Admin open create event modal
+      $('#btn-open-create-modal').on('click', function () {
+        $('#modal-title').text('Create New Civic Event');
+        $('#modal-submit-text').text('Publish Event');
+        $('#event-form')[0].reset();
+        $('#event-id').val('');
+        $('#image-preview-wrapper').addClass('hidden');
+        selectedImageFile = null;
+        $('#event-modal').removeClass('hidden');
+      });
+
+      // RBAC: Admin open edit event modal
+      $(document).on('click', '.btn-edit-event', function () {
+        const eventId = $(this).data('id');
+        const event = allEvents.find(e => e.id === eventId);
+        if (!event) return;
+
+        $('#modal-title').text('Edit Civic Event');
+        $('#modal-submit-text').text('Update Event');
+        $('#event-id').val(event.id);
+        $('#event-title').val(event.title);
+        $('#event-desc').val(event.description);
+        $('#event-location').val(event.location);
+
+        if (event.starts_at) {
+          const starts = new Date(event.starts_at).toISOString().slice(0, 16);
+          $('#event-starts').val(starts);
+        }
+        if (event.ends_at) {
+          const ends = new Date(event.ends_at).toISOString().slice(0, 16);
+          $('#event-ends').val(ends);
+        }
+
+        if (event.metadata && event.metadata.image_url) {
+          $('#image-preview').attr('src', event.metadata.image_url);
+          $('#image-preview-wrapper').removeClass('hidden');
+        } else {
+          $('#image-preview-wrapper').addClass('hidden');
+        }
+
+        $('#event-modal').removeClass('hidden');
+      });
+
+      // Modal close handlers
+      $('#btn-close-modal, #btn-cancel-modal, #modal-backdrop').on('click', function () {
+        $('#event-modal').addClass('hidden');
+      });
+
+      // Image file input preview
+      $('#event-image-input').on('change', function (e) {
+        const file = e.target.files[0];
+        if (file) {
+          // Validate file size (2MB)
+          if (file.size > 2 * 1024 * 1024) {
+            alert('Image must be smaller than 2MB.');
+            $(this).val('');
+            return;
+          }
+          selectedImageFile = file;
+          const reader = new FileReader();
+          reader.onload = function (event) {
+            $('#image-preview').attr('src', event.target.result);
+            $('#image-preview-wrapper').removeClass('hidden');
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+
+      $('#btn-remove-image').on('click', function () {
+        $('#event-image-input').val('');
+        selectedImageFile = null;
+        $('#image-preview-wrapper').addClass('hidden');
+      });
+
+      // RBAC: Admin submit create/edit event form
+      $('#event-form').on('submit', function (e) {
+        e.preventDefault();
+
+        const eventId = $('#event-id').val();
+        const isEditing = !!eventId;
+
+        const formData = new FormData();
+        formData.append('title', $('#event-title').val().trim());
+        formData.append('description', $('#event-desc').val().trim());
+        formData.append('location', $('#event-location').val().trim());
+        formData.append('starts_at', $('#event-starts').val());
+        formData.append('ends_at', $('#event-ends').val());
+
+        if (selectedImageFile) {
+          formData.append('image', selectedImageFile);
+        }
+
+        const saveBtn = $('#btn-save-event');
+        saveBtn.prop('disabled', true);
+        $('#modal-spinner').removeClass('hidden');
+
+        const endpoint = isEditing ? `/events/${eventId}` : '/events';
+        const method = isEditing ? 'PUT' : 'POST';
+
+        API.upload(endpoint, formData, method)
+          .done(function () {
+            Components.showToast(isEditing ? 'Event updated successfully' : 'Event published successfully', 'success');
+            $('#event-modal').addClass('hidden');
+            loadEvents();
+          })
+          .fail(function (xhr) {
+            const errorMsg = (xhr.responseJSON && xhr.responseJSON.message) || 'Failed to save event.';
+            Components.showToast(errorMsg, 'error');
+          })
+          .always(function () {
+            saveBtn.prop('disabled', false);
+            $('#modal-spinner').addClass('hidden');
+          });
+      });
+
+      // Fallback demo events for unauthenticated browsing
+      function renderFallbackEvents() {
+        allEvents = [
+          {
+            id: 'demo-1',
+            title: 'Annual City Marathon',
+            description: 'Join thousands of residents for our signature fitness event along the scenic waterfront.',
+            location: 'Riverside Park, Pavilion B',
+            starts_at: new Date(Date.now() + 86400000 * 3).toISOString(),
+            metadata: { image_url: 'https://images.unsplash.com/photo-1452626038306-9aae5e071dd3?auto=format&fit=crop&w=800&q=80' }
+          },
+          {
+            id: 'demo-2',
+            title: 'Community Clean-Up Day',
+            description: 'Help us keep Civic Hills beautiful! Gloves, bags, and refreshments provided.',
+            location: 'Oak Street Depot',
+            starts_at: new Date(Date.now() + 86400000 * 7).toISOString(),
+            metadata: { image_url: 'https://images.unsplash.com/photo-1618477461853-cf6ed80faba5?auto=format&fit=crop&w=800&q=80' }
+          },
+          {
+            id: 'demo-3',
+            title: 'Public Library Open Forum',
+            description: 'Meet city officials to discuss the upcoming library expansion and community budget.',
+            location: 'Central Library, Hall A',
+            starts_at: new Date(Date.now() + 86400000 * 12).toISOString(),
+            metadata: { image_url: 'https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=800&q=80' }
+          }
+        ];
+        populateLocations(allEvents);
+        applyFilters();
+      }
+    });
+  </script>
+</body>
+</html>
