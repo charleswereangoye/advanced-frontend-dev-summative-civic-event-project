@@ -151,6 +151,27 @@
           <p id="confirm-error" class="text-xs text-red-600 mt-1 hidden">Passwords do not match.</p>
         </div>
 
+        <!-- Account Role Selection (Resident vs Admin for Assessment RBAC) -->
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1.5">Account Role</label>
+          <div class="grid grid-cols-2 gap-3">
+            <label class="relative flex flex-col p-3 border border-slate-200 rounded-xl cursor-pointer hover:border-blue-500 hover:bg-blue-50/40 transition">
+              <div class="flex items-center gap-2">
+                <input type="radio" name="role" value="user" checked class="text-blue-600 focus:ring-blue-500">
+                <span class="text-xs font-bold text-slate-900">Resident</span>
+              </div>
+              <span class="text-[11px] text-slate-500 mt-1 ml-5">Standard citizen access</span>
+            </label>
+            <label class="relative flex flex-col p-3 border border-slate-200 rounded-xl cursor-pointer hover:border-blue-500 hover:bg-blue-50/40 transition">
+              <div class="flex items-center gap-2">
+                <input type="radio" name="role" value="admin" class="text-blue-600 focus:ring-blue-500">
+                <span class="text-xs font-bold text-slate-900">Administrator</span>
+              </div>
+              <span class="text-[11px] text-slate-500 mt-1 ml-5">Full management access</span>
+            </label>
+          </div>
+        </div>
+
         <!-- Submit Button -->
         <button 
           type="submit" 
@@ -319,12 +340,14 @@
         $('#btn-text').text('Creating account...');
         $('#btn-spinner').removeClass('hidden');
 
+        const selectedRole = $('input[name="role"]:checked').val() || 'user';
+
         // Payload for backend signup API
         const payload = {
           full_name: fullName,
           email: email,
           password: password,
-          role: 'user'
+          role: selectedRole
         };
 
         $.ajax({
