@@ -467,5 +467,37 @@ const Components = {
     setTimeout(() => {
       toast.fadeOut(400, () => toast.remove());
     }, 3500);
+  },
+
+  // Contextual Event Image resolver (matches cards and detail views 100%)
+  getEventImageUrl: function (event) {
+    if (event && event.metadata && event.metadata.image_url) {
+      return event.metadata.image_url;
+    }
+    const title = ((event && event.title) || '').toLowerCase();
+    const desc = ((event && event.description) || '').toLowerCase();
+    const loc = ((event && event.location) || '').toLowerCase();
+    const cat = (event && event.metadata && event.metadata.category ? event.metadata.category : '').toLowerCase();
+    const combined = `${title} ${desc} ${loc} ${cat}`;
+
+    if (combined.includes('marathon') || combined.includes('run') || combined.includes('athletic')) {
+      return 'https://images.unsplash.com/photo-1452626038306-9aae5e071dd3?auto=format&fit=crop&w=1200&q=80';
+    }
+    if (combined.includes('clean') || combined.includes('green') || combined.includes('tree') || combined.includes('environment') || combined.includes('earth')) {
+      return 'https://images.unsplash.com/photo-1618477461853-cf6ed80faba5?auto=format&fit=crop&w=1200&q=80';
+    }
+    if (combined.includes('library') || combined.includes('tech') || combined.includes('code') || combined.includes('forum') || combined.includes('education')) {
+      return 'https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=1200&q=80';
+    }
+    if (combined.includes('jazz') || combined.includes('music') || combined.includes('concert') || combined.includes('sunset') || combined.includes('band')) {
+      return 'https://images.unsplash.com/photo-1511192336575-5a79af67a629?auto=format&fit=crop&w=1200&q=80';
+    }
+    if (combined.includes('market') || combined.includes('farmer') || combined.includes('craft') || combined.includes('artisan') || combined.includes('food')) {
+      return 'https://images.unsplash.com/photo-1488459716781-31db52582fe9?auto=format&fit=crop&w=1200&q=80';
+    }
+    if (combined.includes('soccer') || combined.includes('football') || combined.includes('sports') || combined.includes('youth') || combined.includes('league')) {
+      return 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=1200&q=80';
+    }
+    return 'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1200&q=80';
   }
 };
