@@ -40,6 +40,12 @@ const Auth = {
     return user && user.role === 'admin';
   },
 
+  // Update stored user object while keeping auth token intact
+  updateUser: function (updatedUser) {
+    const storage = localStorage.getItem('token') ? localStorage : sessionStorage;
+    storage.setItem('user', JSON.stringify(updatedUser));
+  },
+
   // Sign out and redirect to login
   logout: function () {
     localStorage.removeItem('token');
