@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Event Details - CivicEvents+</title>
+  
+  <!-- Inter Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              600: '#2563eb',
+              700: '#1d4ed8',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+</head>
+<body class="bg-[#F8FAFC] text-[#0F172A] font-sans min-h-screen flex flex-col justify-between">
+
+  <!-- Navbar Placeholder -->
+  <div id="navbar-placeholder"></div>
+
+  <!-- Main Container -->
+  <main class="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
+    
+    <!-- Breadcrumb -->
+    <nav class="flex items-center gap-2 text-xs font-medium text-slate-500 mb-6">
+      <a href="index.html" class="hover:text-blue-600 transition">Home</a>
+      <span>/</span>
+      <a href="index.html" class="hover:text-blue-600 transition">Events</a>
+      <span>/</span>
+      <span class="text-slate-800 font-semibold truncate max-w-xs" id="breadcrumb-title">Event Detail</span>
+    </nav>
+
+    <!-- Loading Skeleton -->
+    <div id="detail-skeleton" class="space-y-6 animate-pulse">
+      <div class="h-96 bg-slate-200 rounded-3xl w-full"></div>
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="lg:col-span-2 space-y-4">
+          <div class="h-8 bg-slate-200 rounded w-3/4"></div>
+          <div class="h-4 bg-slate-200 rounded w-1/2"></div>
+          <div class="h-32 bg-slate-200 rounded w-full"></div>
+        </div>
+        <div class="h-64 bg-slate-200 rounded-2xl w-full"></div>
+      </div>
+    </div>
+
+    <!-- Error State -->
+    <div id="detail-error" class="hidden py-16 text-center bg-white border border-slate-200 rounded-2xl p-8 max-w-xl mx-auto">
+      <svg class="w-12 h-12 mx-auto text-red-500 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+      <h2 class="text-lg font-bold text-slate-800">Event Not Found</h2>
+      <p class="text-sm text-slate-500 mt-1">The event you are looking for may have expired or been removed.</p>
+      <a href="index.html" class="inline-block mt-4 px-4 py-2 text-xs font-semibold text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition">
+        Return to Events Directory
+      </a>
+    </div>
+
+    <!-- Event Detail Content -->
+    <div id="detail-content" class="hidden space-y-8">
+      
+      <!-- Top Banner Image -->
+      <div class="relative w-full aspect-21/9 md:aspect-21/8 rounded-3xl overflow-hidden bg-slate-100 shadow-sm border border-slate-200">
+        <img id="event-banner" src="" alt="Event Banner" class="w-full h-full object-cover">
+        <div class="absolute bottom-4 left-4 bg-white/95 backdrop-blur-xs px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-bold text-blue-600 shadow-sm" id="event-category-badge">
+          Civic Event
+        </div>
+      </div>
+
+      <!-- 2-Column Layout (Figma Frame #1:285) -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        <!-- Left Column: Main Description & Feedback (8 cols) -->
+        <div class="lg:col-span-8 space-y-8">
+          
+          <!-- Event Header Card -->
+          <div class="bg-white border border-slate-200 rounded-2xl p-6 md:p-8 shadow-xs space-y-4">
+            <h1 class="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight" id="event-title"></h1>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-slate-600 pt-2 border-t border-slate-100">
+              <!-- Date & Time -->
+              <div class="flex items-start gap-2.5">
+                <span class="p-2 bg-blue-50 text-blue-600 rounded-lg shrink-0">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                </span>
+                <div>
+                  <span class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">Date &amp; Schedule</span>
+                  <span class="font-medium text-slate-800" id="event-datetime"></span>
+                </div>
+              </div>
+
+              <!-- Location & Map Link -->
+              <div class="flex items-start gap-2.5">
+                <span class="p-2 bg-blue-50 text-blue-600 rounded-lg shrink-0">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path></svg>
+                </span>
+                <div>
+                  <span class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">Location</span>
+                  <span class="font-medium text-slate-800" id="event-location"></span>
+                  <a id="event-map-link" href="#" target="_blank" rel="noopener noreferrer" class="block text-xs text-blue-600 hover:underline mt-0.5">
+                    View on Google Maps &rarr;
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- About This Event -->
+          <div class="bg-white border border-slate-200 rounded-2xl p-6 md:p-8 shadow-xs">
+            <h2 class="text-lg font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">About this event</h2>
+            <div class="text-sm md:text-base text-slate-700 leading-relaxed whitespace-pre-line" id="event-description"></div>
+          </div>
+
+          <!-- Community Feedback & Reviews Section -->
+          <div class="bg-white border border-slate-200 rounded-2xl p-6 md:p-8 shadow-xs space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+              <div>
+                <h2 class="text-lg font-bold text-slate-900">Attendee Reviews &amp; Feedback</h2>
+                <p class="text-xs text-slate-500 mt-0.5">Verified civic participant ratings and feedback</p>
+              </div>
+
+              <!-- Average rating score -->
+              <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 px-3.5 py-1.5 rounded-xl">
+                <span class="text-amber-500 text-base">★</span>
+                <span class="text-sm font-bold text-slate-900" id="avg-rating-value">4.8</span>
+                <span class="text-xs text-slate-400">/ 5.0</span>
+                <span class="text-xs text-slate-500 border-l border-slate-200 pl-2" id="reviews-count">0 reviews</span>
+              </div>
+            </div>
+
+            <!-- Add Feedback Form (Logged in users only) -->
+            <div id="add-feedback-wrapper" class="hidden bg-slate-50 border border-slate-200 rounded-xl p-5">
+              <h3 class="text-sm font-bold text-slate-900 mb-2">Leave Your Feedback</h3>
+              <form id="feedback-form" class="space-y-3">
+                <!-- Star Rating selector -->
+                <div>
+                  <label class="block text-xs font-semibold text-slate-600 mb-1">Your Rating *</label>
+                  <div class="flex items-center gap-1.5 text-2xl cursor-pointer" id="star-picker">
+                    <span class="star-btn text-slate-300 hover:text-amber-400 transition" data-rating="1">★</span>
+                    <span class="star-btn text-slate-300 hover:text-amber-400 transition" data-rating="2">★</span>
+                    <span class="star-btn text-slate-300 hover:text-amber-400 transition" data-rating="3">★</span>
+                    <span class="star-btn text-slate-300 hover:text-amber-400 transition" data-rating="4">★</span>
+                    <span class="star-btn text-slate-300 hover:text-amber-400 transition" data-rating="5">★</span>
+                    <input type="hidden" id="feedback-rating" value="5" required>
+                  </div>
+                </div>
+
+                <!-- Comment text -->
+                <div>
+                  <label for="feedback-comment" class="block text-xs font-semibold text-slate-600 mb-1">Comment</label>
+                  <textarea id="feedback-comment" rows="2" placeholder="Share your experience or civic feedback..." required class="w-full px-3 py-2 text-sm bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 transition"></textarea>
+                </div>
+
+                <button type="submit" id="btn-submit-feedback" class="py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs rounded-xl shadow-xs transition cursor-pointer">
+                  Submit Feedback
+                </button>
+              </form>
+            </div>
+
+            <!-- User submitted message if already submitted -->
+            <div id="feedback-already-submitted" class="hidden p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-800 font-medium">
+              ✓ Thank you! You have already submitted feedback for this event.
+            </div>
+
+            <!-- Reviews List Container -->
+            <div id="reviews-list" class="space-y-3">
+              <div class="text-center py-6 text-slate-400 text-sm">No reviews yet for this event.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Registration Card & Admin Attendees List (4 cols) -->
+        <div class="lg:col-span-4 space-y-6 lg:sticky lg:top-28">
+          
+          <!-- Registration Card (Figma Action Sidebar) -->
+          <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
+            <div>
+              <span class="text-xs font-bold uppercase tracking-wider text-blue-600">Event Admission</span>
+              <div class="text-2xl font-black text-slate-900 mt-0.5">Free Admission</div>
+              <p class="text-xs text-slate-500 mt-1">Open to all city residents &amp; registered participants</p>
+            </div>
+
+            <!-- Registration Status and Buttons -->
+            <div id="registration-action-wrapper" class="pt-2 border-t border-slate-100 space-y-3">
+              
+              <!-- State A: Not Registered -->
+              <div id="state-not-registered">
+                <button 
+                  id="btn-register-event"
+                  class="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm rounded-xl shadow-sm transition flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <span id="reg-btn-text">Register for Event</span>
+                  <span id="reg-btn-spinner" class="hidden animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
+                </button>
+              </div>
+
+              <!-- State B: Already Registered -->
+              <div id="state-registered" class="hidden space-y-2">
+                <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-center">
+                  <span class="text-xs font-bold text-emerald-700 flex items-center justify-center gap-1.5">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    You are Registered for this Event
+                  </span>
+                </div>
+                <button 
+                  id="btn-cancel-registration"
+                  class="w-full py-2.5 px-4 text-xs font-semibold text-red-600 bg-red-50 hover:bg-red-100 rounded-xl transition border border-red-200 cursor-pointer"
+                >
+                  Cancel Registration
+                </button>
+              </div>
+
+              <!-- State C: Guest Mode (Not logged in) -->
+              <div id="state-guest" class="hidden space-y-2">
+                <a 
+                  href="login.html" 
+                  class="block w-full py-3 px-4 text-center bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm rounded-xl shadow-sm transition"
+                >
+                  Sign in to Register
+                </a>
+              </div>
+            </div>
+
+            <!-- Quick Specs -->
+            <div class="pt-4 border-t border-slate-100 space-y-2.5 text-xs text-slate-600">
+              <div class="flex items-center justify-between">
+                <span class="text-slate-400">Confirmation:</span>
+                <span class="font-medium text-slate-800">Instant Email &amp; In-App</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-slate-400">Entry requirement:</span>
+                <span class="font-medium text-slate-800">Digital ID / Confirmation</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-slate-400">Cancellation:</span>
+                <span class="font-medium text-slate-800">Available anytime before event</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- RBAC: Admin-Only Registrants List Section -->
+          <div id="admin-attendees-card" class="hidden bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-3">
+            <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+              <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-purple-600"></span>
+                <h3 class="text-sm font-bold text-slate-900">Registered Attendees</h3>
+              </div>
+              <span id="attendees-count-badge" class="px-2 py-0.5 text-xs font-semibold bg-purple-100 text-purple-700 rounded-full">0</span>
+            </div>
+
+            <p class="text-[11px] text-slate-400">Admin-only attendee oversight for this event.</p>
+
+            <div class="max-h-64 overflow-y-auto divide-y divide-slate-100 text-xs" id="attendees-table-body">
+              <div class="text-center py-4 text-slate-400">Loading attendees...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer Placeholder -->
+  <div id="footer-placeholder"></div>
+
+  <!-- Scripts -->
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/components.js"></script>
+  <script>
+    $(document).ready(function () {
+      // Initialize components
+      Components.renderNavbar('events');
+      Components.renderDrawer();
+      Components.renderFooter();
+
+      // Read event ID from query param
+      const urlParams = new URLSearchParams(window.location.search);
+      const eventId = urlParams.get('id');
+
+      if (!eventId) {
+        $('#detail-skeleton').addClass('hidden');
+        $('#detail-error').removeClass('hidden').find('h2').text('No Event Specified');
+        return;
+      }
+
+      let currentEvent = null;
+      let isUserRegistered = false;
+
+      // Handle Star Picker UI
+      let selectedRating = 5;
+      $('.star-btn').on('mouseenter click', function () {
+        const rating = parseInt($(this).data('rating'));
+        selectedRating = rating;
+        $('#feedback-rating').val(rating);
+        updateStarDisplay(rating);
+      });
+
+      function updateStarDisplay(rating) {
+        $('.star-btn').each(function () {
+          const r = parseInt($(this).data('rating'));
+          if (r <= rating) {
+            $(this).removeClass('text-slate-300').addClass('text-amber-400');
+          } else {
+            $(this).removeClass('text-amber-400').addClass('text-slate-300');
+          }
+        });
+      }
+      updateStarDisplay(5);
+
+      // Fetch Event Details
+      fetchEventDetails();
+
+      function fetchEventDetails() {
+        $('#detail-skeleton').removeClass('hidden');
+        $('#detail-content, #detail-error').addClass('hidden');
+
+        // Check fallback for demo IDs if user not logged in
+        if (eventId.startsWith('demo-')) {
+          handleDemoEvent(eventId);
+          return;
+        }
+
+        API.get(`/events/${eventId}`)
+          .done(function (res) {
+            currentEvent = res.data;
+            if (!currentEvent) {
+              $('#detail-skeleton').addClass('hidden');
+              $('#detail-error').removeClass('hidden');
+              return;
+            }
+            renderEvent(currentEvent);
+            checkRegistrationStatus();
+            loadEventFeedback();
+
+            // RBAC: Load attendees list for admin users
+            if (Auth.isAdmin()) {
+              loadAdminAttendees();
+            }
+          })
+          .fail(function () {
+            $('#detail-skeleton').addClass('hidden');
+            $('#detail-error').removeClass('hidden');
+          });
+      }
+
+      // Populate Event DOM
+      function renderEvent(event) {
+        $('#detail-skeleton').addClass('hidden');
+        $('#detail-content').removeClass('hidden');
+
+        $('#breadcrumb-title').text(event.title);
+        $('#event-title').text(event.title);
+        $('#event-description').text(event.description || 'No detailed description provided.');
+        $('#event-location').text(event.location || 'Civic Center');
+
+        // Google Maps Link
+        const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location || 'Civic Center')}`;
+        $('#event-map-link').attr('href', mapsUrl);
+
+        // Date and Time formatting
+        const startDate = new Date(event.starts_at);
+        const endDate = event.ends_at ? new Date(event.ends_at) : null;
+        let dateStr = startDate.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+        dateStr += ` · ${startDate.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })}`;
+        if (endDate) {
+          dateStr += ` – ${endDate.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })}`;
+        }
+        $('#event-datetime').text(dateStr);
+
+        // Banner Image: metadata URL or thematic fallback
+        let bannerUrl = 'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1200&q=80';
+        if (event.metadata && event.metadata.image_url) {
+          bannerUrl = event.metadata.image_url;
+        } else if (event.title.toLowerCase().includes('marathon')) {
+          bannerUrl = 'https://images.unsplash.com/photo-1452626038306-9aae5e071dd3?auto=format&fit=crop&w=1200&q=80';
+        } else if (event.title.toLowerCase().includes('clean')) {
+          bannerUrl = 'https://images.unsplash.com/photo-1618477461853-cf6ed80faba5?auto=format&fit=crop&w=1200&q=80';
+        } else if (event.title.toLowerCase().includes('library')) {
+          bannerUrl = 'https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=1200&q=80';
+        }
+        $('#event-banner').attr('src', bannerUrl);
+
+        // Handle Registration Buttons by auth state
+        if (!Auth.isAuthenticated()) {
+          $('#state-guest').removeClass('hidden');
+          $('#state-not-registered, #state-registered').addClass('hidden');
+        } else {
+          $('#state-guest').addClass('hidden');
+          $('#add-feedback-wrapper').removeClass('hidden');
+        }
+      }
+
+      // Check if logged-in user is already registered for this event
+      function checkRegistrationStatus() {
+        if (!Auth.isAuthenticated()) return;
+
+        API.get('/event-registrations/my-registrations')
+          .done(function (res) {
+            const regs = res.data || [];
+            isUserRegistered = regs.some(r => r.event_id === eventId || (r.event && r.event.id === eventId));
+
+            if (isUserRegistered) {
+              $('#state-registered').removeClass('hidden');
+              $('#state-not-registered').addClass('hidden');
+            } else {
+              $('#state-not-registered').removeClass('hidden');
+              $('#state-registered').addClass('hidden');
+            }
+          });
+      }
+
+      // Register for Event action
+      $('#btn-register-event').on('click', function () {
+        if (!Auth.isAuthenticated()) {
+          window.location.href = 'login.html';
+          return;
+        }
+
+        const btn = $(this);
+        btn.prop('disabled', true);
+        $('#reg-btn-spinner').removeClass('hidden');
+
+        API.post('/event-registrations/register', { event_id: eventId })
+          .done(function () {
+            Components.showToast('Successfully registered for event!', 'success');
+            isUserRegistered = true;
+            $('#state-registered').removeClass('hidden');
+            $('#state-not-registered').addClass('hidden');
+            if (Auth.isAdmin()) loadAdminAttendees();
+          })
+          .fail(function (xhr) {
+            const msg = (xhr.responseJSON && xhr.responseJSON.message) || 'Failed to register.';
+            Components.showToast(msg, 'error');
+          })
+          .always(function () {
+            btn.prop('disabled', false);
+            $('#reg-btn-spinner').addClass('hidden');
+          });
+      });
+
+      // Cancel Registration action
+      $('#btn-cancel-registration').on('click', function () {
+        if (confirm('Are you sure you want to cancel your registration for this event?')) {
+          API.post('/event-registrations/cancel', { event_id: eventId })
+            .done(function () {
+              Components.showToast('Registration cancelled', 'success');
+              isUserRegistered = false;
+              $('#state-not-registered').removeClass('hidden');
+              $('#state-registered').addClass('hidden');
+              if (Auth.isAdmin()) loadAdminAttendees();
+            })
+            .fail(function (xhr) {
+              const msg = (xhr.responseJSON && xhr.responseJSON.message) || 'Failed to cancel registration.';
+              Components.showToast(msg, 'error');
+            });
+        }
+      });
+
+      // Load Event Feedback
+      function loadEventFeedback() {
+        const isAdmin = Auth.isAdmin();
+        const endpoint = isAdmin ? `/event-feedback/event/${eventId}` : '/event-feedback/my-feedback';
+
+        API.get(endpoint)
+          .done(function (res) {
+            let feedbacks = res.data || [];
+            
+            // For regular users, filter feedback for this specific event
+            if (!isAdmin) {
+              feedbacks = feedbacks.filter(f => f.event_id === eventId);
+              if (feedbacks.length > 0) {
+                $('#add-feedback-wrapper').addClass('hidden');
+                $('#feedback-already-submitted').removeClass('hidden');
+              }
+            }
+
+            renderFeedbackList(feedbacks);
+          })
+          .fail(function () {
+            renderFeedbackList([]);
+          });
+      }
+
+      function renderFeedbackList(feedbacks) {
+        const container = $('#reviews-list');
+        container.empty();
+
+        if (feedbacks.length === 0) {
+          container.html('<div class="text-center py-6 text-slate-400 text-sm">No attendee reviews submitted yet.</div>');
+          $('#reviews-count').text('0 reviews');
+          return;
+        }
+
+        $('#reviews-count').text(`${feedbacks.length} review${feedbacks.length === 1 ? '' : 's'}`);
+        
+        // Calculate average rating
+        const avg = (feedbacks.reduce((acc, f) => acc + (f.rating || 5), 0) / feedbacks.length).toFixed(1);
+        $('#avg-rating-value').text(avg);
+
+        feedbacks.forEach(f => {
+          const dateStr = new Date(f.created_at || Date.now()).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+          const stars = '★'.repeat(f.rating || 5) + '☆'.repeat(5 - (f.rating || 5));
+
+          const item = $(`
+            <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+              <div class="flex items-center justify-between text-xs">
+                <span class="font-bold text-slate-800">${f.user_name || f.full_name || 'Community Resident'}</span>
+                <span class="text-slate-400">${dateStr}</span>
+              </div>
+              <div class="text-amber-500 text-sm tracking-wider">${stars}</div>
+              <p class="text-xs text-slate-600 mt-1 leading-relaxed">${f.comment || ''}</p>
+            </div>
+          `);
+          container.append(item);
+        });
+      }
+
+      // Submit Feedback
+      $('#feedback-form').on('submit', function (e) {
+        e.preventDefault();
+        const rating = parseInt($('#feedback-rating').val());
+        const comment = $('#feedback-comment').val().trim();
+
+        if (!comment) return;
+
+        const submitBtn = $('#btn-submit-feedback');
+        submitBtn.prop('disabled', true).text('Submitting...');
+
+        API.post('/event-feedback', { event_id: eventId, rating: rating, comment: comment })
+          .done(function () {
+            Components.showToast('Thank you! Your feedback has been submitted.', 'success');
+            $('#add-feedback-wrapper').addClass('hidden');
+            $('#feedback-already-submitted').removeClass('hidden');
+            loadEventFeedback();
+          })
+          .fail(function (xhr) {
+            const msg = (xhr.responseJSON && xhr.responseJSON.message) || 'Failed to submit feedback.';
+            Components.showToast(msg, 'error');
+            submitBtn.prop('disabled', false).text('Submit Feedback');
+          });
+      });
+
+      // RBAC: Load Attendees List for Admin
+      function loadAdminAttendees() {
+        $('#admin-attendees-card').removeClass('hidden');
+        const container = $('#attendees-table-body');
+
+        API.get(`/event-registrations/event/${eventId}/attendees`)
+          .done(function (res) {
+            const attendees = res.data || [];
+            container.empty();
+
+            $('#attendees-count-badge').text(attendees.length);
+
+            if (attendees.length === 0) {
+              container.html('<div class="text-center py-4 text-slate-400">No registered attendees yet.</div>');
+              return;
+            }
+
+            attendees.forEach(a => {
+              const regDate = new Date(a.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+              const row = $(`
+                <div class="py-2.5 flex items-center justify-between">
+                  <div class="truncate pr-2">
+                    <p class="font-semibold text-slate-800 truncate">${a.full_name || a.user_name || 'Resident'}</p>
+                    <p class="text-[11px] text-slate-400 truncate">${a.email || ''}</p>
+                  </div>
+                  <div class="text-right shrink-0">
+                    <span class="inline-block px-1.5 py-0.5 text-[10px] font-semibold uppercase rounded ${a.status === 'registered' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'}">
+                      ${a.status || 'Registered'}
+                    </span>
+                    <span class="block text-[10px] text-slate-400 mt-0.5">${regDate}</span>
+                  </div>
+                </div>
+              `);
+              container.append(row);
+            });
+          })
+          .fail(function () {
+            container.html('<div class="text-center py-3 text-red-500">Failed to load attendees.</div>');
+          });
+      }
+
+      // Demo fallback handler
+      function handleDemoEvent(demoId) {
+        const demos = {
+          'demo-1': {
+            id: 'demo-1',
+            title: 'Annual City Marathon',
+            description: 'Join thousands of residents for our signature fitness event along the scenic waterfront. This year features three distinct routes: a Half Marathon (21.1km), a 10K, and a 5K Fun Run.\n\nAll proceeds go toward the City Green Space Initiative.',
+            location: 'Riverside Park, Pavilion B',
+            starts_at: new Date(Date.now() + 86400000 * 3).toISOString(),
+            metadata: { image_url: 'https://images.unsplash.com/photo-1452626038306-9aae5e071dd3?auto=format&fit=crop&w=1200&q=80' }
+          },
+          'demo-2': {
+            id: 'demo-2',
+            title: 'Community Clean-Up Day',
+            description: 'Help us keep Civic Hills beautiful! Gloves, collection bags, and refreshments will be provided for all volunteers. Join neighbors at the Oak Street Depot.',
+            location: 'Oak Street Depot',
+            starts_at: new Date(Date.now() + 86400000 * 7).toISOString(),
+            metadata: { image_url: 'https://images.unsplash.com/photo-1618477461853-cf6ed80faba5?auto=format&fit=crop&w=1200&q=80' }
+          },
+          'demo-3': {
+            id: 'demo-3',
+            title: 'Public Library Open Forum',
+            description: 'Meet city officials and community organizers to discuss the upcoming library expansion and budget allocation for next year.',
+            location: 'Central Library, Hall A',
+            starts_at: new Date(Date.now() + 86400000 * 12).toISOString(),
+            metadata: { image_url: 'https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=1200&q=80' }
+          }
+        };
+
+        const demoEvent = demos[demoId];
+        if (demoEvent) {
+          renderEvent(demoEvent);
+          renderFeedbackList([
+            { full_name: 'Sarah Mitchell', rating: 5, comment: 'Loved attending last year! Super well organized and great community spirit.', created_at: new Date().toISOString() }
+          ]);
+        } else {
+          $('#detail-skeleton').addClass('hidden');
+          $('#detail-error').removeClass('hidden');
+        }
+      }
+    });
+  </script>
+</body>
+</html>
