@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Audio Announcements - CivicEvents+</title>
+  
+  <!-- Inter Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              600: '#2563eb',
+              700: '#1d4ed8',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+</head>
+<body class="bg-[#F8FAFC] text-[#0F172A] font-sans min-h-screen flex flex-col justify-between">
+
+  <!-- Navbar Placeholder -->
+  <div id="navbar-placeholder"></div>
+
+  <!-- Main Container -->
+  <main class="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-10">
+    
+    <!-- Page Header (Matching Figma Frame #1:754) -->
+    <div class="mb-8">
+      <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">Media &amp; Announcements</h1>
+      <p class="text-slate-600 text-sm md:text-base mt-1">Listen to weekly civic audio updates and watch community video promos.</p>
+
+      <!-- Tab Switcher -->
+      <div class="flex items-center gap-8 border-b border-slate-200 mt-6">
+        <a href="announcements.html" class="pb-3 text-sm font-semibold text-blue-600 border-b-2 border-blue-600 flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 100-6 3 3 0 000 6z"></path></svg>
+          Audio Announcements
+        </a>
+        <a href="promos.html" class="pb-3 text-sm font-medium text-slate-500 hover:text-slate-800 transition flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+          Video Promos
+        </a>
+      </div>
+    </div>
+
+    <!-- 2-Column Content Layout (Figma Frame #1:754) -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      
+      <!-- Left Column: Audio Announcements List (8 cols) -->
+      <div class="lg:col-span-8 space-y-6">
+        
+        <!-- Active Featured Player Card -->
+        <div id="featured-player-card" class="bg-white border border-slate-200 rounded-2xl p-6 md:p-8 shadow-xs space-y-6">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <span class="inline-block px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider bg-blue-100 text-blue-700 rounded-full mb-2" id="player-badge">
+                Official Broadcast
+              </span>
+              <h2 class="text-xl md:text-2xl font-bold text-slate-900" id="player-title">Mayor's Weekly Civic Address</h2>
+              <p class="text-xs text-slate-500 mt-1" id="player-date">Published recently</p>
+            </div>
+            
+            <a id="player-download-btn" href="#" download class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl transition">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+              Download MP3
+            </a>
+          </div>
+
+          <!-- Native Audio element (with accessible fallback text) -->
+          <audio id="html5-audio" class="hidden" preload="metadata">
+            Your browser does not support the audio element.
+          </audio>
+
+          <!-- Custom Accessible Audio Player Controls -->
+          <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 md:p-6 space-y-4">
+            
+            <!-- Scrubber Track -->
+            <div class="space-y-1">
+              <div class="relative w-full h-2 bg-slate-200 rounded-full cursor-pointer overflow-hidden" id="scrubber-track" role="slider" aria-label="Audio progress slider" tabindex="0">
+                <div id="scrubber-progress" class="h-full bg-blue-600 rounded-full w-0 transition-all duration-75"></div>
+              </div>
+              <div class="flex justify-between text-xs font-medium text-slate-500">
+                <span id="current-time">00:00</span>
+                <span id="total-duration">--:--</span>
+              </div>
+            </div>
+
+            <!-- Buttons & Volume -->
+            <div class="flex items-center justify-between gap-4">
+              <div class="flex items-center gap-3">
+                <!-- Play / Pause Button -->
+                <button 
+                  id="btn-play-pause"
+                  class="w-12 h-12 rounded-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center shadow-md transition cursor-pointer focus:ring-4 focus:ring-blue-100"
+                  aria-label="Play announcement"
+                >
+                  <svg id="icon-play" class="w-5 h-5 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                  <svg id="icon-pause" class="w-5 h-5 hidden" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                </button>
+
+                <!-- 15s Skip Backward -->
+                <button id="btn-skip-back" class="p-2 text-slate-500 hover:text-slate-800 rounded-lg text-xs font-semibold flex items-center gap-1 cursor-pointer" title="Rewind 15 seconds">
+                  -15s
+                </button>
+
+                <!-- 15s Skip Forward -->
+                <button id="btn-skip-forward" class="p-2 text-slate-500 hover:text-slate-800 rounded-lg text-xs font-semibold flex items-center gap-1 cursor-pointer" title="Fast forward 15 seconds">
+                  +15s
+                </button>
+              </div>
+
+              <!-- Volume Control -->
+              <div class="hidden sm:flex items-center gap-2">
+                <button id="btn-mute" class="text-slate-400 hover:text-slate-700 p-1" aria-label="Toggle mute">
+                  <svg id="icon-volume" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path></svg>
+                </button>
+                <input 
+                  type="range" 
+                  id="volume-slider" 
+                  min="0" 
+                  max="1" 
+                  step="0.05" 
+                  value="0.8"
+                  class="w-20 accent-blue-600 cursor-pointer"
+                  aria-label="Volume slider"
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- Transcript Accordion -->
+          <div class="border-t border-slate-100 pt-4">
+            <button 
+              id="btn-toggle-transcript" 
+              class="w-full flex items-center justify-between text-xs font-bold text-slate-700 hover:text-blue-600 transition cursor-pointer"
+            >
+              <span class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                Accessibility Transcript
+              </span>
+              <span id="transcript-toggle-icon">▼</span>
+            </button>
+            <div id="transcript-content" class="hidden mt-3 p-4 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-600 leading-relaxed max-h-48 overflow-y-auto">
+              This official civic audio announcement provides updates regarding municipal operations, upcoming public town halls, and community services. Please use the controls above to listen.
+            </div>
+          </div>
+        </div>
+
+        <!-- Secondary Announcements List -->
+        <div class="space-y-4">
+          <h3 class="text-lg font-bold text-slate-900">Recent Announcements</h3>
+          
+          <!-- Loading skeleton -->
+          <div id="announcements-skeleton" class="space-y-3">
+            <div class="h-20 bg-white border border-slate-200 rounded-2xl p-4 animate-pulse"></div>
+            <div class="h-20 bg-white border border-slate-200 rounded-2xl p-4 animate-pulse"></div>
+          </div>
+
+          <div id="announcements-list" class="hidden space-y-3"></div>
+
+          <!-- Empty state -->
+          <div id="announcements-empty" class="hidden py-12 text-center bg-white border border-slate-200 rounded-2xl p-6">
+            <svg class="w-12 h-12 mx-auto text-slate-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 100-6 3 3 0 000 6z"></path></svg>
+            <p class="text-sm font-semibold text-slate-700">No announcements published yet.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Civic Media Info & Admin Controls (4 cols) -->
+      <div class="lg:col-span-4 space-y-6">
+        
+        <!-- RBAC: Admin Upload Announcement Button -->
+        <div id="admin-announcement-controls" class="hidden bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-3">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-blue-600"></span>
+            <h3 class="text-sm font-bold text-slate-900">Admin Audio Hub</h3>
+          </div>
+          <p class="text-xs text-slate-500">Record or upload an MP3/WAV civic audio broadcast.</p>
+          <button 
+            id="btn-open-upload-modal"
+            class="w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs rounded-xl shadow-xs transition flex items-center justify-center gap-2 cursor-pointer"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+            Upload Audio Announcement
+          </button>
+        </div>
+
+        <!-- About Civic Media (Matching Figma Frame #1:754) -->
+        <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-4">
+          <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider text-xs text-slate-400">About Civic Media</h3>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            Stay informed with official updates from City Hall. All audio and video media is produced for public transparency and civic awareness.
+          </p>
+
+          <div class="border-t border-slate-100 pt-4 space-y-3 text-xs">
+            <div class="flex items-center justify-between">
+              <span class="text-slate-500">Total Updates</span>
+              <span class="font-bold text-slate-800" id="stat-total-count">0</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-slate-500">Average Duration</span>
+              <span class="font-bold text-slate-800">3m 45s</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-slate-500">Audio Format</span>
+              <span class="font-bold text-slate-800">MP3 / WAV (Accessible)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- RBAC: Admin Upload Audio Announcement Modal -->
+  <div id="upload-modal" class="hidden fixed inset-0 z-50 overflow-y-auto">
+    <div class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs transition-opacity" id="modal-backdrop"></div>
+    <div class="flex min-h-full items-center justify-center p-4">
+      <div class="relative bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200">
+        
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+          <h3 class="text-base font-bold text-slate-900">Upload Audio Announcement</h3>
+          <button type="button" id="btn-close-modal" class="text-slate-400 hover:text-slate-600 p-1">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+          </button>
+        </div>
+
+        <form id="upload-form" class="space-y-4">
+          <!-- Title -->
+          <div>
+            <label for="announcement-title" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Announcement Title *</label>
+            <input type="text" id="announcement-title" required placeholder="e.g. Mayor's Weekly Address" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600 transition">
+          </div>
+
+          <!-- Audio File Input -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Audio File (MP3, WAV, OGG) *</label>
+            <input type="file" id="announcement-audio-file" accept="audio/mp3,audio/wav,audio/m4a,audio/ogg" required class="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
+            <p class="text-[11px] text-slate-400 mt-1">Maximum file size: 5MB</p>
+          </div>
+
+          <!-- Published Toggle -->
+          <div class="flex items-center gap-2 pt-1">
+            <input type="checkbox" id="announcement-published" checked class="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500">
+            <label for="announcement-published" class="text-xs font-medium text-slate-700">Publish immediately to public feed</label>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex items-center justify-end gap-2 pt-4 border-t border-slate-100">
+            <button type="button" id="btn-cancel-modal" class="px-3.5 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition">
+              Cancel
+            </button>
+            <button type="submit" id="btn-submit-audio" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl shadow-xs transition flex items-center gap-1.5 cursor-pointer">
+              <span id="btn-upload-text">Upload &amp; Broadcast</span>
+              <span id="upload-spinner" class="hidden animate-spin h-3.5 w-3.5 border-2 border-white border-t-transparent rounded-full"></span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer Placeholder -->
+  <div id="footer-placeholder"></div>
+
+  <!-- Scripts -->
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/components.js"></script>
+  <script>
+    $(document).ready(function () {
+      // Initialize components
+      Components.renderNavbar('announcements');
+      Components.renderDrawer();
+      Components.renderFooter();
+
+      // State
+      let allAnnouncements = [];
+      let currentAudio = document.getElementById('html5-audio');
+      let activeItem = null;
+
+      // RBAC: Admin check
+      if (Auth.isAdmin()) {
+        $('#admin-announcement-controls').removeClass('hidden');
+      }
+
+      // Load announcements from backend
+      loadAnnouncements();
+
+      function loadAnnouncements() {
+        $('#announcements-skeleton').removeClass('hidden');
+        $('#announcements-list, #announcements-empty').addClass('hidden');
+
+        // Check authentication
+        if (!Auth.isAuthenticated()) {
+          $('#announcements-skeleton').addClass('hidden');
+          renderFallbackAnnouncements();
+          return;
+        }
+
+        API.get('/announcements')
+          .done(function (res) {
+            allAnnouncements = res.data || [];
+            renderAnnouncements(allAnnouncements);
+          })
+          .fail(function (xhr) {
+            $('#announcements-skeleton').addClass('hidden');
+            if (xhr.status === 401) {
+              renderFallbackAnnouncements();
+            } else {
+              $('#announcements-empty').removeClass('hidden');
+            }
+          });
+      }
+
+      function renderAnnouncements(items) {
+        $('#announcements-skeleton').addClass('hidden');
+        const container = $('#announcements-list');
+        container.empty();
+
+        const isAdmin = Auth.isAdmin();
+        // RBAC: normal users only see published items
+        const visibleItems = items.filter(a => isAdmin || a.published !== false);
+        $('#stat-total-count').text(visibleItems.length);
+
+        if (visibleItems.length === 0) {
+          $('#announcements-empty').removeClass('hidden');
+          return;
+        }
+
+        $('#announcements-empty').addClass('hidden');
+        container.removeClass('hidden');
+
+        // Set top/first item in featured player
+        if (!activeItem && visibleItems.length > 0) {
+          setFeaturedAudio(visibleItems[0]);
+        }
+
+        visibleItems.forEach((ann, idx) => {
+          const dateStr = new Date(ann.created_at || Date.now()).toLocaleDateString(undefined, {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric'
+          });
+
+          const itemEl = $(`
+            <div class="p-4 bg-white border border-slate-200 rounded-2xl hover:border-slate-300 transition flex items-center justify-between gap-4 group">
+              <div class="flex items-center gap-3.5 min-w-0">
+                <button 
+                  class="btn-play-item w-10 h-10 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition flex items-center justify-center shrink-0 cursor-pointer"
+                  data-idx="${idx}"
+                  aria-label="Play ${ann.title}"
+                >
+                  <svg class="w-4 h-4 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                </button>
+                <div class="min-w-0">
+                  <h4 class="text-sm font-bold text-slate-900 truncate">${ann.title}</h4>
+                  <div class="flex items-center gap-2 text-xs text-slate-400 mt-0.5">
+                    <span>${dateStr}</span>
+                    <span>•</span>
+                    <span class="text-blue-600 font-semibold">Audio Update</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Actions & Admin Controls -->
+              <div class="flex items-center gap-2 shrink-0">
+                <!-- RBAC: Admin actions: Publish/Unpublish toggle and Delete -->
+                ${isAdmin ? `
+                  <button 
+                    class="btn-toggle-publish p-1.5 text-xs font-semibold rounded-lg border transition ${ann.published ? 'border-emerald-200 text-emerald-700 bg-emerald-50 hover:bg-emerald-100' : 'border-slate-200 text-slate-500 bg-slate-50 hover:bg-slate-100'}"
+                    data-id="${ann.id}"
+                    data-published="${ann.published}"
+                  >
+                    ${ann.published ? 'Published' : 'Draft'}
+                  </button>
+                  <button 
+                    class="btn-delete-announcement p-1.5 text-slate-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition"
+                    data-id="${ann.id}"
+                    title="Delete Announcement"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                  </button>
+                ` : ''}
+              </div>
+            </div>
+          `);
+
+          container.append(itemEl);
+        });
+      }
+
+      // Set audio in featured player
+      function setFeaturedAudio(ann) {
+        activeItem = ann;
+        $('#player-title').text(ann.title);
+        const dateStr = new Date(ann.created_at || Date.now()).toLocaleDateString(undefined, {
+          month: 'long',
+          day: 'numeric',
+          year: 'numeric'
+        });
+        $('#player-date').text(`Published ${dateStr}`);
+        $('#player-download-btn').attr('href', ann.audio_url || '#');
+
+        if (ann.audio_url) {
+          currentAudio.src = ann.audio_url;
+          currentAudio.load();
+        }
+        resetPlayerUI();
+      }
+
+      // Audio player event listeners
+      $('#btn-play-pause').on('click', function () {
+        if (!currentAudio.src) return;
+
+        if (currentAudio.paused) {
+          currentAudio.play();
+          $('#icon-play').addClass('hidden');
+          $('#icon-pause').removeClass('hidden');
+        } else {
+          currentAudio.pause();
+          $('#icon-play').removeClass('hidden');
+          $('#icon-pause').addClass('hidden');
+        }
+      });
+
+      // Update progress bar
+      currentAudio.addEventListener('timeupdate', function () {
+        if (!currentAudio.duration) return;
+        const percent = (currentAudio.currentTime / currentAudio.duration) * 100;
+        $('#scrubber-progress').css('width', `${percent}%`);
+        $('#current-time').text(formatTime(currentAudio.currentTime));
+      });
+
+      // Loaded metadata: update duration
+      currentAudio.addEventListener('loadedmetadata', function () {
+        $('#total-duration').text(formatTime(currentAudio.duration));
+      });
+
+      // Audio ended
+      currentAudio.addEventListener('ended', function () {
+        resetPlayerUI();
+      });
+
+      function resetPlayerUI() {
+        $('#icon-play').removeClass('hidden');
+        $('#icon-pause').addClass('hidden');
+        $('#scrubber-progress').css('width', '0%');
+        $('#current-time').text('00:00');
+      }
+
+      // Scrubber click to seek
+      $('#scrubber-track').on('click', function (e) {
+        if (!currentAudio.duration) return;
+        const trackWidth = $(this).width();
+        const clickX = e.offsetX;
+        const newTime = (clickX / trackWidth) * currentAudio.duration;
+        currentAudio.currentTime = newTime;
+      });
+
+      // 15s skip buttons
+      $('#btn-skip-back').on('click', function () {
+        if (currentAudio.currentTime) {
+          currentAudio.currentTime = Math.max(0, currentAudio.currentTime - 15);
+        }
+      });
+
+      $('#btn-skip-forward').on('click', function () {
+        if (currentAudio.duration) {
+          currentAudio.currentTime = Math.min(currentAudio.duration, currentAudio.currentTime + 15);
+        }
+      });
+
+      // Volume slider
+      $('#volume-slider').on('input', function () {
+        currentAudio.volume = parseFloat($(this).val());
+      });
+
+      // Mute toggle
+      $('#btn-mute').on('click', function () {
+        currentAudio.muted = !currentAudio.muted;
+        $(this).toggleClass('text-blue-600', currentAudio.muted);
+      });
+
+      // Toggle transcript accordion
+      $('#btn-toggle-transcript').on('click', function () {
+        $('#transcript-content').toggleClass('hidden');
+        const isHidden = $('#transcript-content').hasClass('hidden');
+        $('#transcript-toggle-icon').text(isHidden ? '▼' : '▲');
+      });
+
+      // Play item from list
+      $(document).on('click', '.btn-play-item', function () {
+        const idx = $(this).data('idx');
+        const item = allAnnouncements[idx];
+        if (item) {
+          setFeaturedAudio(item);
+          currentAudio.play();
+          $('#icon-play').addClass('hidden');
+          $('#icon-pause').removeClass('hidden');
+          window.scrollTo({ top: 120, behavior: 'smooth' });
+        }
+      });
+
+      // Format seconds to mm:ss
+      function formatTime(seconds) {
+        if (isNaN(seconds)) return '--:--';
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+      }
+
+      // RBAC: Admin upload audio announcement modal
+      $('#btn-open-upload-modal').on('click', function () {
+        $('#upload-form')[0].reset();
+        $('#upload-modal').removeClass('hidden');
+      });
+
+      $('#btn-close-modal, #btn-cancel-modal, #modal-backdrop').on('click', function () {
+        $('#upload-modal').addClass('hidden');
+      });
+
+      // Submit upload
+      $('#upload-form').on('submit', function (e) {
+        e.preventDefault();
+
+        const fileInput = document.getElementById('announcement-audio-file');
+        const file = fileInput.files[0];
+        if (!file) return;
+
+        // Size check: 5MB limit
+        if (file.size > 5 * 1024 * 1024) {
+          alert('Audio file size must be less than 5MB.');
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append('title', $('#announcement-title').val().trim());
+        formData.append('published', $('#announcement-published').is(':checked'));
+        formData.append('audio', file);
+
+        const btn = $('#btn-submit-audio');
+        btn.prop('disabled', true);
+        $('#upload-spinner').removeClass('hidden');
+
+        API.upload('/announcements', formData, 'POST')
+          .done(function () {
+            Components.showToast('Audio announcement broadcasted successfully!', 'success');
+            $('#upload-modal').addClass('hidden');
+            loadAnnouncements();
+          })
+          .fail(function (xhr) {
+            const msg = (xhr.responseJSON && xhr.responseJSON.message) || 'Failed to upload audio.';
+            Components.showToast(msg, 'error');
+          })
+          .always(function () {
+            btn.prop('disabled', false);
+            $('#upload-spinner').addClass('hidden');
+          });
+      });
+
+      // RBAC: Admin delete announcement
+      $(document).on('click', '.btn-delete-announcement', function () {
+        const id = $(this).data('id');
+        if (confirm('Are you sure you want to delete this audio announcement?')) {
+          API.delete(`/announcements/${id}`)
+            .done(function () {
+              Components.showToast('Announcement deleted', 'success');
+              loadAnnouncements();
+            })
+            .fail(function () {
+              Components.showToast('Failed to delete announcement', 'error');
+            });
+        }
+      });
+
+      // RBAC: Admin publish / unpublish toggle
+      $(document).on('click', '.btn-toggle-publish', function () {
+        const id = $(this).data('id');
+        const isPublished = $(this).data('published') === true || $(this).data('published') === 'true';
+        const action = isPublished ? 'unpublish' : 'publish';
+
+        API.patch(`/announcements/${id}/${action}`)
+          .done(function () {
+            Components.showToast(`Announcement ${action}ed successfully`, 'success');
+            loadAnnouncements();
+          })
+          .fail(function () {
+            Components.showToast(`Failed to ${action} announcement`, 'error');
+          });
+      });
+
+      // Demo fallback announcements
+      function renderFallbackAnnouncements() {
+        allAnnouncements = [
+          {
+            id: 'demo-a1',
+            title: "Mayor's Weekly Civic Address",
+            published: true,
+            created_at: new Date(Date.now() - 86400000 * 2).toISOString(),
+            audio_url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'
+          },
+          {
+            id: 'demo-a2',
+            title: 'Road Maintenance Schedule: Week of Oct 12',
+            published: true,
+            created_at: new Date(Date.now() - 86400000 * 4).toISOString(),
+            audio_url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3'
+          },
+          {
+            id: 'demo-a3',
+            title: 'Public Library Winter Hours & Digital Access Update',
+            published: true,
+            created_at: new Date(Date.now() - 86400000 * 7).toISOString(),
+            audio_url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3'
+          }
+        ];
+        renderAnnouncements(allAnnouncements);
+      }
+    });
+  </script>
+</body>
+</html>
