@@ -423,11 +423,8 @@
           const dayNum = dateObj.getDate();
           const timeStr = dateObj.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
           
-          // Image resolution: backend metadata URL or civic placeholder
-          let imageUrl = 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=800&q=80';
-          if (event.metadata && event.metadata.image_url) {
-            imageUrl = event.metadata.image_url;
-          }
+          // Image resolution: resolve matching cover photo via Components
+          const imageUrl = Components.getEventImageUrl(event);
 
           const card = $(`
             <article class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs hover:shadow-md transition flex flex-col justify-between group">
@@ -736,28 +733,52 @@
       function renderFallbackEvents() {
         allEvents = [
           {
-            id: 'demo-1',
-            title: 'Annual City Marathon',
-            description: 'Join thousands of residents for our signature fitness event along the scenic waterfront.',
-            location: 'Riverside Park, Pavilion B',
-            starts_at: new Date(Date.now() + 86400000 * 3).toISOString(),
-            metadata: { image_url: 'https://images.unsplash.com/photo-1452626038306-9aae5e071dd3?auto=format&fit=crop&w=800&q=80' }
+            id: '11cd89c9-3d7a-4094-a0d0-5f4a511d3298',
+            title: 'Annual Civic Marathon 2026',
+            description: 'Join thousands of city runners for the 15th annual civic marathon passing through city hall, waterfront park, and downtown avenues.',
+            location: 'City Hall Plaza & Waterfront',
+            starts_at: new Date(Date.now() + 86400000 * 5).toISOString(),
+            metadata: { category: 'Sports & Recreation', image_url: 'https://images.unsplash.com/photo-1452626038306-9aae5e071dd3?auto=format&fit=crop&w=1200&q=80' }
           },
           {
-            id: 'demo-2',
-            title: 'Community Clean-Up Day',
-            description: 'Help us keep Civic Hills beautiful! Gloves, bags, and refreshments provided.',
-            location: 'Oak Street Depot',
-            starts_at: new Date(Date.now() + 86400000 * 7).toISOString(),
-            metadata: { image_url: 'https://images.unsplash.com/photo-1618477461853-cf6ed80faba5?auto=format&fit=crop&w=800&q=80' }
+            id: '48a23150-5174-4d27-b9db-4d07998ef72f',
+            title: 'Green Earth Community Clean-Up',
+            description: 'Community volunteering initiative to plant indigenous trees, clean up Riverside Park trails, and promote sustainable civic green spaces.',
+            location: 'Riverside Community Park',
+            starts_at: new Date(Date.now() + 86400000 * 11).toISOString(),
+            metadata: { category: 'Community & Environment', image_url: 'https://images.unsplash.com/photo-1618477461853-cf6ed80faba5?auto=format&fit=crop&w=1200&q=80' }
           },
           {
-            id: 'demo-3',
-            title: 'Public Library Open Forum',
-            description: 'Meet city officials to discuss the upcoming library expansion and community budget.',
-            location: 'Central Library, Hall A',
-            starts_at: new Date(Date.now() + 86400000 * 12).toISOString(),
-            metadata: { image_url: 'https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=800&q=80' }
+            id: 'd9978ad4-baab-44d0-87b5-1b6ce3e4b34e',
+            title: 'Public Library Tech & Coding Forum',
+            description: 'Free hands-on digital literacy and coding workshops for all citizens, hosted by local university mentors and tech leaders.',
+            location: 'Central Library Innovation Lab',
+            starts_at: new Date(Date.now() + 86400000 * 15).toISOString(),
+            metadata: { category: 'Education & Technology', image_url: 'https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=1200&q=80' }
+          },
+          {
+            id: 'c82da6a5-4174-46aa-b8dd-5a3a16b20f32',
+            title: 'Sunset Jazz in the Botanical Gardens',
+            description: 'An evening of live jazz, acoustic soul, and local food trucks under the stars at Highland Botanical Gardens.',
+            location: 'Highland Botanical Gardens Amphitheater',
+            starts_at: new Date(Date.now() + 86400000 * 19).toISOString(),
+            metadata: { category: 'Arts & Culture', image_url: 'https://images.unsplash.com/photo-1511192336575-5a79af67a629?auto=format&fit=crop&w=1200&q=80' }
+          },
+          {
+            id: '0835ff74-1e0d-49ae-96c3-7288af53bb7f',
+            title: 'Downtown Farmers & Artisans Market',
+            description: 'Support local regional growers, craft makers, and bakers. Enjoy live street acoustic sets and fresh farm-to-table produce.',
+            location: 'Civic Market Square & Promenade',
+            starts_at: new Date(Date.now() + 86400000 * 24).toISOString(),
+            metadata: { category: 'Food & Community', image_url: 'https://images.unsplash.com/photo-1488459716781-31db52582fe9?auto=format&fit=crop&w=1200&q=80' }
+          },
+          {
+            id: '88ffbfb8-6ea3-4bcb-9b41-5c2b722199a4',
+            title: 'Youth Soccer Championship Kickoff',
+            description: 'Annual inter-district civic youth soccer tournament featuring 16 community teams, skills clinics, and family fun zones.',
+            location: 'Memorial Athletic Sports Complex',
+            starts_at: new Date(Date.now() + 86400000 * 28).toISOString(),
+            metadata: { category: 'Youth & Sports', image_url: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=1200&q=80' }
           }
         ];
         populateLocations(allEvents);
