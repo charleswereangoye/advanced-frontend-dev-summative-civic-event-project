@@ -215,7 +215,7 @@
             <p class="text-xs text-slate-500 mt-0.5">Manage citizen accounts, oversight, and activation status.</p>
           </div>
 
-          <!-- Note on rubric constraint -->
+          <!-- Role changes disabled to protect user permissions -->
           <div class="text-[11px] font-semibold text-slate-400 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-xl">
             Policy: Role changes disabled via UI
           </div>
@@ -290,12 +290,11 @@
     $(document).ready(function () {
       // RBAC Page Guard: Admins only
       if (!Auth.isAuthenticated()) {
-        window.location.href = 'login.html';
+        window.location.replace('login.html');
         return;
       }
       if (!Auth.isAdmin()) {
-        alert('Access Denied: You must be an administrator to view this page.');
-        window.location.href = 'index.html';
+        window.location.replace('index.html');
         return;
       }
 

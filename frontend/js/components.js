@@ -175,6 +175,9 @@ const Components = {
     `;
 
     $('#navbar-placeholder').html(navbarHtml);
+    if (isLoggedIn) {
+      this.renderDrawer();
+    }
     this.initNavbarEvents();
   },
 
@@ -216,6 +219,7 @@ const Components = {
 
   // Slide-over Notification Drawer
   renderDrawer: function () {
+    if ($('#notification-drawer-wrapper').length) return;
     const drawerHtml = `
       <div id="notification-drawer-wrapper" class="hidden fixed inset-0 z-50 overflow-hidden">
         <!-- Backdrop -->

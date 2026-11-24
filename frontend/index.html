@@ -671,7 +671,7 @@
         if (file) {
           // Validate file size (2MB)
           if (file.size > 2 * 1024 * 1024) {
-            alert('Image must be smaller than 2MB.');
+            Components.showToast('Image must be smaller than 2MB.', 'error');
             $(this).val('');
             return;
           }

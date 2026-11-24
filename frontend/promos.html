@@ -429,7 +429,7 @@
 
         // Size check: 8MB limit
         if (file.size > 8 * 1024 * 1024) {
-          alert('Video file size must be less than 8MB.');
+          Components.showToast('Video file size must be less than 8MB.', 'error');
           return;
         }
 

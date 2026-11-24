@@ -387,7 +387,7 @@
         saveBtn.prop('disabled', true);
         $('#save-btn-spinner').removeClass('hidden');
 
-        // NOTE: Strict backend validation prohibits sending 'role' or 'is_active' in the PATCH body
+        // Only update allowed fields (role and status cannot be updated by users)
         const payload = {
           full_name: fullName,
           email: email

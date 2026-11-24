@@ -416,7 +416,7 @@
         API.get('/event-registrations/my-registrations')
           .done(function (res) {
             const regs = res.data || [];
-            isUserRegistered = regs.some(r => r.event_id === eventId || (r.event && r.event.id === eventId));
+            isUserRegistered = regs.some(r => (r.event_id === eventId || (r.event && r.event.id === eventId)) && r.status === 'registered');
 
             if (isUserRegistered) {
               $('#state-registered').removeClass('hidden');
