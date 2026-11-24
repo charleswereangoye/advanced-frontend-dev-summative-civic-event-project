@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up - CivicEvents+</title>
+  
+  <!-- Inter Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              600: '#2563eb',
+              700: '#1d4ed8',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+</head>
+<body class="bg-[#F8FAFC] text-[#0F172A] font-sans min-h-screen flex flex-col justify-between">
+
+  <!-- Toast notification container -->
+  <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-3"></div>
+
+  <!-- Main header / logo -->
+  <header class="py-6 px-8 max-w-7xl mx-auto w-full flex items-center justify-between">
+    <a href="index.html" class="flex items-center gap-2.5">
+      <img src="assets/logo.svg" alt="CivicEvents+ Logo" class="w-6 h-6">
+      <span class="text-xl font-bold tracking-tight text-slate-900">CivicEvents+</span>
+    </a>
+    <a href="login.html" class="text-sm font-medium text-slate-600 hover:text-blue-600 transition">
+      Already have an account? <span class="text-blue-600 font-semibold underline ml-1">Sign In</span>
+    </a>
+  </header>
+
+  <!-- Signup Form Container -->
+  <main class="flex-1 flex items-center justify-center px-4 py-8">
+    <div class="w-full max-w-md bg-white border border-slate-200 rounded-2xl shadow-sm p-8">
+      
+      <div class="text-center mb-6">
+        <h1 class="text-2xl font-bold text-slate-900">Create your account</h1>
+        <p class="text-sm text-slate-600 mt-1">Join your community portal to discover and register for events</p>
+      </div>
+
+      <!-- General alert box -->
+      <div id="form-alert" class="hidden mb-5 p-3 rounded-xl text-sm font-medium"></div>
+
+      <form id="signup-form" novalidate class="space-y-4">
+        <!-- Full Name -->
+        <div>
+          <label for="full_name" class="block text-sm font-medium text-slate-700 mb-1">Full Name</label>
+          <input 
+            type="text" 
+            id="full_name" 
+            name="full_name" 
+            required 
+            placeholder="e.g. Jane Doe"
+            class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition"
+          >
+          <p id="name-error" class="text-xs text-red-600 mt-1 hidden">Full name is required.</p>
+        </div>
+
+        <!-- Email -->
+        <div>
+          <label for="email" class="block text-sm font-medium text-slate-700 mb-1">Email Address</label>
+          <input 
+            type="email" 
+            id="email" 
+            name="email" 
+            required 
+            placeholder="jane@example.com"
+            class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition"
+          >
+          <p id="email-error" class="text-xs text-red-600 mt-1 hidden">Please enter a valid email address.</p>
+        </div>
+
+        <!-- Password -->
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label for="password" class="block text-sm font-medium text-slate-700">Password</label>
+            <button type="button" id="toggle-password" class="text-xs text-slate-500 hover:text-slate-800">Show</button>
+          </div>
+          <input 
+            type="password" 
+            id="password" 
+            name="password" 
+            required 
+            placeholder="••••••••"
+            class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition"
+          >
+          
+          <!-- Password strength meter -->
+          <div class="mt-2">
+            <div class="flex items-center justify-between text-xs mb-1">
+              <span class="text-slate-500">Password strength:</span>
+              <span id="strength-text" class="font-semibold text-slate-400">Empty</span>
+            </div>
+            <div class="grid grid-cols-4 gap-1.5 h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+              <div id="bar-1" class="h-full bg-slate-200 transition-colors duration-300"></div>
+              <div id="bar-2" class="h-full bg-slate-200 transition-colors duration-300"></div>
+              <div id="bar-3" class="h-full bg-slate-200 transition-colors duration-300"></div>
+              <div id="bar-4" class="h-full bg-slate-200 transition-colors duration-300"></div>
+            </div>
+          </div>
+
+          <!-- Password rules checklist -->
+          <ul class="mt-2.5 space-y-1 text-xs text-slate-500" id="password-rules">
+            <li id="rule-length" class="flex items-center gap-1.5 text-slate-400">
+              <span>•</span> At least 8 characters
+            </li>
+            <li id="rule-casing" class="flex items-center gap-1.5 text-slate-400">
+              <span>•</span> Uppercase and lowercase letters
+            </li>
+            <li id="rule-number" class="flex items-center gap-1.5 text-slate-400">
+              <span>•</span> At least one number
+            </li>
+            <li id="rule-special" class="flex items-center gap-1.5 text-slate-400">
+              <span>•</span> At least one special character (!@#$%^&*)
+            </li>
+          </ul>
+        </div>
+
+        <!-- Confirm Password -->
+        <div>
+          <label for="confirm_password" class="block text-sm font-medium text-slate-700 mb-1">Confirm Password</label>
+          <input 
+            type="password" 
+            id="confirm_password" 
+            name="confirm_password" 
+            required 
+            placeholder="••••••••"
+            class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition"
+          >
+          <p id="confirm-error" class="text-xs text-red-600 mt-1 hidden">Passwords do not match.</p>
+        </div>
+
+        <!-- Submit Button -->
+        <button 
+          type="submit" 
+          id="submit-btn"
+          class="w-full mt-2 py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm rounded-xl shadow-sm transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <span id="btn-text">Create Account</span>
+          <span id="btn-spinner" class="hidden animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
+        </button>
+      </form>
+
+      <!-- Terms note -->
+      <p class="text-xs text-center text-slate-500 mt-6">
+        By creating an account, you agree to the CivicEvents+ 
+        <a href="#" class="underline hover:text-slate-800">Terms of Service</a> and 
+        <a href="#" class="underline hover:text-slate-800">Privacy Policy</a>.
+      </p>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="py-6 text-center text-xs text-slate-500 border-t border-slate-200">
+    <p>&copy; 2026 CivicEvents+. Accessible City Events &amp; Services Portal.</p>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/config.js"></script>
+  <script>
+    $(document).ready(function () {
+      // Toggle password visibility
+      $('#toggle-password').on('click', function () {
+        const passwordInput = $('#password');
+        const isPassword = passwordInput.attr('type') === 'password';
+        passwordInput.attr('type', isPassword ? 'text' : 'password');
+        $(this).text(isPassword ? 'Hide' : 'Show');
+      });
+
+      // Toast notification helper
+      function showToast(message, type = 'success') {
+        const bgColor = type === 'success' ? 'bg-emerald-600' : 'bg-red-600';
+        const toast = $(`
+          <div class="${bgColor} text-white px-4 py-3 rounded-xl shadow-lg text-sm font-medium flex items-center gap-2 transition transform duration-300">
+            <span>${message}</span>
+          </div>
+        `);
+        $('#toast-container').append(toast);
+        setTimeout(() => {
+          toast.fadeOut(400, () => toast.remove());
+        }, 3500);
+      }
+
+      // Check password rules and update strength meter
+      function evaluatePassword(pwd) {
+        const hasLength = pwd.length >= 8;
+        const hasMixedCase = /[a-z]/.test(pwd) && /[A-Z]/.test(pwd);
+        const hasNumber = /[0-9]/.test(pwd);
+        const hasSpecial = /[^A-Za-z0-9]/.test(pwd);
+
+        // Update checklist UI
+        updateRule('#rule-length', hasLength);
+        updateRule('#rule-casing', hasMixedCase);
+        updateRule('#rule-number', hasNumber);
+        updateRule('#rule-special', hasSpecial);
+
+        let score = 0;
+        if (hasLength) score++;
+        if (hasMixedCase) score++;
+        if (hasNumber) score++;
+        if (hasSpecial) score++;
+
+        // Reset bars
+        $('#bar-1, #bar-2, #bar-3, #bar-4').removeClass('bg-red-500 bg-amber-500 bg-yellow-500 bg-emerald-500').addClass('bg-slate-200');
+
+        if (pwd.length === 0) {
+          $('#strength-text').text('Empty').attr('class', 'font-semibold text-slate-400');
+          return 0;
+        }
+
+        if (score <= 1) {
+          $('#bar-1').removeClass('bg-slate-200').addClass('bg-red-500');
+          $('#strength-text').text('Weak').attr('class', 'font-semibold text-red-500');
+        } else if (score === 2) {
+          $('#bar-1, #bar-2').removeClass('bg-slate-200').addClass('bg-amber-500');
+          $('#strength-text').text('Fair').attr('class', 'font-semibold text-amber-500');
+        } else if (score === 3) {
+          $('#bar-1, #bar-2, #bar-3').removeClass('bg-slate-200').addClass('bg-yellow-500');
+          $('#strength-text').text('Good').attr('class', 'font-semibold text-yellow-600');
+        } else {
+          $('#bar-1, #bar-2, #bar-3, #bar-4').removeClass('bg-slate-200').addClass('bg-emerald-500');
+          $('#strength-text').text('Strong').attr('class', 'font-semibold text-emerald-600');
+        }
+
+        return score;
+      }
+
+      function updateRule(selector, isValid) {
+        const el = $(selector);
+        if (isValid) {
+          el.removeClass('text-slate-400').addClass('text-emerald-600 font-medium');
+          el.find('span').text('✓');
+        } else {
+          el.removeClass('text-emerald-600 font-medium').addClass('text-slate-400');
+          el.find('span').text('•');
+        }
+      }
+
+      // Realtime password input listener
+      $('#password').on('input', function () {
+        evaluatePassword($(this).val());
+      });
+
+      // Confirm password listener
+      $('#confirm_password').on('input', function () {
+        if ($(this).val() !== $('#password').val()) {
+          $('#confirm-error').removeClass('hidden');
+        } else {
+          $('#confirm-error').addClass('hidden');
+        }
+      });
+
+      // Form submission
+      $('#signup-form').on('submit', function (e) {
+        e.preventDefault();
+
+        const fullName = $('#full_name').val().trim();
+        const email = $('#email').val().trim();
+        const password = $('#password').val();
+        const confirmPassword = $('#confirm_password').val();
+
+        // Reset errors
+        $('#name-error, #email-error, #confirm-error').addClass('hidden');
+        $('#form-alert').addClass('hidden').empty();
+
+        let hasError = false;
+
+        if (!fullName) {
+          $('#name-error').removeClass('hidden');
+          hasError = true;
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email || !emailRegex.test(email)) {
+          $('#email-error').removeClass('hidden');
+          hasError = true;
+        }
+
+        const score = evaluatePassword(password);
+        if (score < 4) {
+          $('#form-alert')
+            .removeClass('hidden')
+            .addClass('bg-red-50 text-red-700 border border-red-200')
+            .text('Password does not meet all security requirements.');
+          hasError = true;
+        }
+
+        if (password !== confirmPassword) {
+          $('#confirm-error').removeClass('hidden');
+          hasError = true;
+        }
+
+        if (hasError) return;
+
+        // Button loading state
+        const submitBtn = $('#submit-btn');
+        submitBtn.prop('disabled', true);
+        $('#btn-text').text('Creating account...');
+        $('#btn-spinner').removeClass('hidden');
+
+        // Payload for backend signup API
+        const payload = {
+          full_name: fullName,
+          email: email,
+          password: password,
+          role: 'user'
+        };
+
+        $.ajax({
+          url: `${API_BASE_URL}/auth/signup`,
+          type: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify(payload),
+          success: function (res) {
+            showToast('Account created successfully! Redirecting to login...', 'success');
+            setTimeout(function () {
+              window.location.href = 'login.html';
+            }, 1500);
+          },
+          error: function (xhr) {
+            submitBtn.prop('disabled', false);
+            $('#btn-text').text('Create Account');
+            $('#btn-spinner').addClass('hidden');
+
+            let errorMsg = 'Failed to create account. Please try again.';
+            if (xhr.responseJSON && xhr.responseJSON.message) {
+              errorMsg = xhr.responseJSON.message;
+            } else if (xhr.responseJSON && xhr.responseJSON.errors) {
+              errorMsg = xhr.responseJSON.errors.map(err => err.msg).join('; ');
+            }
+
+            $('#form-alert')
+              .removeClass('hidden')
+              .addClass('bg-red-50 text-red-700 border border-red-200')
+              .text(errorMsg);
+
+            showToast(errorMsg, 'error');
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>
