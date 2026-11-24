@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Video Promos - CivicEvents+</title>
+  
+  <!-- Inter Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              600: '#2563eb',
+              700: '#1d4ed8',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+</head>
+<body class="bg-[#F8FAFC] text-[#0F172A] font-sans min-h-screen flex flex-col justify-between">
+
+  <!-- Navbar Placeholder -->
+  <div id="navbar-placeholder"></div>
+
+  <!-- Main Container -->
+  <main class="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-10">
+    
+    <!-- Page Header (Matching Figma Frame #1:754) -->
+    <div class="mb-8">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">Media &amp; Announcements</h1>
+          <p class="text-slate-600 text-sm md:text-base mt-1">Watch community video promos and official municipal initiatives.</p>
+        </div>
+
+        <!-- RBAC: Admin Upload Promo Button -->
+        <div id="admin-promo-controls" class="hidden">
+          <button 
+            id="btn-open-upload-modal"
+            class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl shadow-xs transition flex items-center gap-2 cursor-pointer"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+            <span>Upload Video Promo</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Tab Switcher -->
+      <div class="flex items-center gap-8 border-b border-slate-200 mt-6">
+        <a href="announcements.html" class="pb-3 text-sm font-medium text-slate-500 hover:text-slate-800 transition flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 100-6 3 3 0 000 6z"></path></svg>
+          Audio Announcements
+        </a>
+        <a href="promos.html" class="pb-3 text-sm font-semibold text-blue-600 border-b-2 border-blue-600 flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+          Video Promos
+        </a>
+      </div>
+    </div>
+
+    <!-- Promos Section -->
+    <div class="space-y-6">
+      
+      <!-- Loading Skeleton -->
+      <div id="promos-skeleton" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden p-4 space-y-4 animate-pulse">
+          <div class="bg-slate-200 aspect-video rounded-xl"></div>
+          <div class="h-5 bg-slate-200 rounded w-3/4"></div>
+          <div class="h-4 bg-slate-200 rounded w-full"></div>
+        </div>
+        <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden p-4 space-y-4 animate-pulse hidden md:block">
+          <div class="bg-slate-200 aspect-video rounded-xl"></div>
+          <div class="h-5 bg-slate-200 rounded w-3/4"></div>
+          <div class="h-4 bg-slate-200 rounded w-full"></div>
+        </div>
+        <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden p-4 space-y-4 animate-pulse hidden lg:block">
+          <div class="bg-slate-200 aspect-video rounded-xl"></div>
+          <div class="h-5 bg-slate-200 rounded w-3/4"></div>
+          <div class="h-4 bg-slate-200 rounded w-full"></div>
+        </div>
+      </div>
+
+      <!-- Promos Grid -->
+      <div id="promos-grid" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+
+      <!-- Empty State -->
+      <div id="promos-empty" class="hidden py-16 text-center bg-white border border-slate-200 rounded-2xl p-8">
+        <svg class="w-16 h-16 mx-auto text-slate-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+        <h3 class="text-base font-bold text-slate-800">No video promos published yet</h3>
+        <p class="text-sm text-slate-500 mt-1">Check back later for civic project updates and community video highlights.</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Video Player Modal with Closed Captions Support -->
+  <div id="video-modal" class="hidden fixed inset-0 z-50 overflow-y-auto" role="dialog" aria-modal="true">
+    <div class="fixed inset-0 bg-slate-900/80 backdrop-blur-xs transition-opacity" id="video-modal-backdrop"></div>
+    <div class="flex min-h-full items-center justify-center p-4">
+      <div class="relative bg-white rounded-3xl max-w-4xl w-full overflow-hidden shadow-2xl border border-slate-200">
+        
+        <!-- Video Header -->
+        <div class="p-5 flex items-center justify-between border-b border-slate-100">
+          <div class="flex items-center gap-2">
+            <span class="px-2 py-0.5 text-[10px] font-bold uppercase rounded bg-blue-100 text-blue-700">Official Promo</span>
+            <h3 class="text-base font-bold text-slate-900 truncate" id="modal-video-title">Community Video Promo</h3>
+          </div>
+          <button type="button" id="btn-close-video-modal" class="text-slate-400 hover:text-slate-700 p-1.5 rounded-lg cursor-pointer">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+          </button>
+        </div>
+
+        <!-- HTML5 Video Element with Native & Track Support -->
+        <div class="relative aspect-video bg-black">
+          <video 
+            id="main-video-player" 
+            controls 
+            playsinline 
+            class="w-full h-full"
+            crossorigin="anonymous"
+          >
+            Your browser does not support HTML5 video.
+          </video>
+        </div>
+
+        <!-- Captions & Transcript Section -->
+        <div class="p-6 bg-slate-50 border-t border-slate-100 space-y-3">
+          <div class="flex items-center justify-between">
+            <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+              <span class="px-1.5 py-0.5 bg-slate-200 text-slate-800 text-[10px] font-extrabold rounded">CC</span>
+              Closed Captions &amp; Accessibility Transcript
+            </h4>
+            <span class="text-xs text-emerald-600 font-semibold">Captions Enabled by Default</span>
+          </div>
+
+          <div id="modal-caption-text" class="p-3.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-700 leading-relaxed max-h-36 overflow-y-auto">
+            No caption text provided for this promo.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RBAC: Admin Upload Promo Modal -->
+  <div id="upload-modal" class="hidden fixed inset-0 z-50 overflow-y-auto">
+    <div class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs transition-opacity" id="upload-backdrop"></div>
+    <div class="flex min-h-full items-center justify-center p-4">
+      <div class="relative bg-white rounded-2xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-200">
+        
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+          <h3 class="text-base font-bold text-slate-900">Upload Video Promo</h3>
+          <button type="button" id="btn-close-upload-modal" class="text-slate-400 hover:text-slate-600 p-1">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+          </button>
+        </div>
+
+        <form id="upload-promo-form" class="space-y-4">
+          <!-- Title -->
+          <div>
+            <label for="promo-title" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Promo Title *</label>
+            <input type="text" id="promo-title" required placeholder="e.g. City Recycling &amp; Sustainability 2026" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600 transition">
+          </div>
+
+          <!-- Description -->
+          <div>
+            <label for="promo-desc" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Summary Description *</label>
+            <textarea id="promo-desc" rows="2" required placeholder="Brief description of the promo video..." class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600 transition"></textarea>
+          </div>
+
+          <!-- Caption Text (Required for accessibility) -->
+          <div>
+            <label for="promo-captions" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Closed Caption Text (Accessibility) *</label>
+            <textarea id="promo-captions" rows="3" required placeholder="Enter subtitle or transcript text for closed captioning..." class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600 transition"></textarea>
+            <p class="text-[11px] text-slate-400 mt-1">This text is compiled into a WebVTT track for hearing accessibility.</p>
+          </div>
+
+          <!-- Video File Input -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Video File (MP4, MOV, MKV) *</label>
+            <input type="file" id="promo-video-file" accept="video/mp4,video/mov,video/avi,video/mkv" required class="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
+            <p class="text-[11px] text-slate-400 mt-1">Maximum file size: 8MB</p>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex items-center justify-end gap-2 pt-4 border-t border-slate-100">
+            <button type="button" id="btn-cancel-upload" class="px-3.5 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition">
+              Cancel
+            </button>
+            <button type="submit" id="btn-submit-promo" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl shadow-xs transition flex items-center gap-1.5 cursor-pointer">
+              <span id="btn-promo-text">Upload Promo</span>
+              <span id="promo-spinner" class="hidden animate-spin h-3.5 w-3.5 border-2 border-white border-t-transparent rounded-full"></span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer Placeholder -->
+  <div id="footer-placeholder"></div>
+
+  <!-- Scripts -->
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/components.js"></script>
+  <script>
+    $(document).ready(function () {
+      // Initialize layout components
+      Components.renderNavbar('promos');
+      Components.renderDrawer();
+      Components.renderFooter();
+
+      let allPromos = [];
+      let currentTrackUrl = null;
+      const videoPlayer = document.getElementById('main-video-player');
+
+      // RBAC: Show admin upload controls
+      if (Auth.isAdmin()) {
+        $('#admin-promo-controls').removeClass('hidden');
+      }
+
+      // Load promos from backend
+      loadPromos();
+
+      function loadPromos() {
+        $('#promos-skeleton').removeClass('hidden');
+        $('#promos-grid, #promos-empty').addClass('hidden');
+
+        // Check authentication
+        if (!Auth.isAuthenticated()) {
+          $('#promos-skeleton').addClass('hidden');
+          renderFallbackPromos();
+          return;
+        }
+
+        API.get('/promos')
+          .done(function (res) {
+            allPromos = res.data || [];
+            renderPromos(allPromos);
+          })
+          .fail(function (xhr) {
+            $('#promos-skeleton').addClass('hidden');
+            if (xhr.status === 401) {
+              renderFallbackPromos();
+            } else {
+              $('#promos-empty').removeClass('hidden');
+            }
+          });
+      }
+
+      function renderPromos(promos) {
+        $('#promos-skeleton').addClass('hidden');
+        const grid = $('#promos-grid');
+        grid.empty();
+
+        const isAdmin = Auth.isAdmin();
+        // RBAC: normal users only see published promos
+        const visiblePromos = promos.filter(p => isAdmin || p.published !== false);
+
+        if (visiblePromos.length === 0) {
+          $('#promos-empty').removeClass('hidden');
+          return;
+        }
+
+        $('#promos-empty').addClass('hidden');
+        grid.removeClass('hidden');
+
+        visiblePromos.forEach((promo, idx) => {
+          // Poster thumbnail: pick matching civic visual
+          let poster = 'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=800&q=80';
+          if (promo.title.toLowerCase().includes('green') || promo.title.toLowerCase().includes('water')) {
+            poster = 'https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=800&q=80';
+          } else if (promo.title.toLowerCase().includes('recycl') || promo.title.toLowerCase().includes('sustain')) {
+            poster = 'https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=800&q=80';
+          } else if (promo.title.toLowerCase().includes('art') || promo.title.toLowerCase().includes('cultur')) {
+            poster = 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=800&q=80';
+          }
+
+          const card = $(`
+            <article class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs hover:shadow-md transition flex flex-col justify-between group">
+              <div>
+                <!-- 16:9 Thumbnail Container with Play Overlay -->
+                <div class="relative aspect-video w-full overflow-hidden bg-slate-900 cursor-pointer btn-open-video" data-idx="${idx}">
+                  <img src="${poster}" alt="${promo.title}" loading="lazy" class="w-full h-full object-cover opacity-85 group-hover:opacity-95 group-hover:scale-105 transition duration-300">
+                  <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                  
+                  <!-- Play Button Overlay -->
+                  <div class="absolute inset-0 flex items-center justify-center">
+                    <div class="w-12 h-12 rounded-full bg-blue-600/90 hover:bg-blue-600 text-white flex items-center justify-center shadow-lg transform group-hover:scale-110 transition duration-200">
+                      <svg class="w-5 h-5 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    </div>
+                  </div>
+
+                  <!-- CC Badge -->
+                  <div class="absolute top-3 right-3 bg-black/60 backdrop-blur-xs px-2 py-0.5 rounded text-[10px] font-bold text-white uppercase tracking-wider">
+                    CC Available
+                  </div>
+                </div>
+
+                <!-- Content -->
+                <div class="p-5">
+                  <span class="inline-block text-[10px] font-bold uppercase tracking-wider text-blue-600 mb-1">Civic Initiative</span>
+                  <h3 class="text-base font-bold text-slate-900 line-clamp-1 group-hover:text-blue-600 transition">${promo.title}</h3>
+                  <p class="text-xs text-slate-500 mt-2 line-clamp-2 leading-relaxed">${promo.description || ''}</p>
+                </div>
+              </div>
+
+              <!-- Footer with Play CTA & Admin Actions -->
+              <div class="p-5 pt-0 border-t border-slate-100 mt-4 flex items-center justify-between gap-2">
+                <button 
+                  class="btn-open-video flex-1 py-2 px-3 text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-slate-100 rounded-xl transition border border-slate-200 text-center cursor-pointer"
+                  data-idx="${idx}"
+                >
+                  Watch Promo
+                </button>
+
+                <!-- RBAC: Admin actions: Publish toggle & Delete -->
+                ${isAdmin ? `
+                  <button 
+                    class="btn-toggle-publish p-1.5 text-xs font-semibold rounded-lg border transition ${promo.published ? 'border-emerald-200 text-emerald-700 bg-emerald-50 hover:bg-emerald-100' : 'border-slate-200 text-slate-500 bg-slate-50 hover:bg-slate-100'}"
+                    data-id="${promo.id}"
+                    data-published="${promo.published}"
+                  >
+                    ${promo.published ? 'Published' : 'Draft'}
+                  </button>
+                  <button 
+                    class="btn-delete-promo p-1.5 text-slate-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition"
+                    data-id="${promo.id}"
+                    title="Delete Promo"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                  </button>
+                ` : ''}
+              </div>
+            </article>
+          `);
+
+          grid.append(card);
+        });
+      }
+
+      // Convert plain text into a valid WebVTT track Blob URL
+      function createWebVTTBlob(text) {
+        const vttContent = `WEBVTT\n\n00:00:00.000 --> 00:03:00.000\n${text.replace(/\n/g, ' ')}`;
+        const blob = new Blob([vttContent], { type: 'text/vtt' });
+        return URL.createObjectURL(blob);
+      }
+
+      // Open Video Modal
+      $(document).on('click', '.btn-open-video', function () {
+        const idx = $(this).data('idx');
+        const promo = allPromos[idx];
+        if (!promo) return;
+
+        $('#modal-video-title').text(promo.title);
+        $('#modal-caption-text').text(promo.caption_text || 'No transcript text available.');
+
+        // Clean up previous blob URL
+        if (currentTrackUrl) {
+          URL.revokeObjectURL(currentTrackUrl);
+          currentTrackUrl = null;
+        }
+
+        // Set video source
+        videoPlayer.src = promo.video_url || 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4';
+        
+        // Remove existing tracks
+        while (videoPlayer.firstChild) {
+          videoPlayer.removeChild(videoPlayer.firstChild);
+        }
+
+        // Add track for closed captions if caption_text exists
+        if (promo.caption_text) {
+          currentTrackUrl = createWebVTTBlob(promo.caption_text);
+          const track = document.createElement('track');
+          track.kind = 'captions';
+          track.label = 'English';
+          track.srclang = 'en';
+          track.src = currentTrackUrl;
+          track.default = true;
+          videoPlayer.appendChild(track);
+        }
+
+        $('#video-modal').removeClass('hidden');
+        videoPlayer.load();
+        videoPlayer.play().catch(() => {});
+      });
+
+      // Close Video Modal
+      $('#btn-close-video-modal, #video-modal-backdrop').on('click', function () {
+        videoPlayer.pause();
+        $('#video-modal').addClass('hidden');
+      });
+
+      // RBAC: Admin upload modal events
+      $('#btn-open-upload-modal').on('click', function () {
+        $('#upload-promo-form')[0].reset();
+        $('#upload-modal').removeClass('hidden');
+      });
+
+      $('#btn-close-upload-modal, #btn-cancel-upload, #upload-backdrop').on('click', function () {
+        $('#upload-modal').addClass('hidden');
+      });
+
+      // Submit upload promo
+      $('#upload-promo-form').on('submit', function (e) {
+        e.preventDefault();
+
+        const fileInput = document.getElementById('promo-video-file');
+        const file = fileInput.files[0];
+        if (!file) return;
+
+        // Size check: 8MB limit
+        if (file.size > 8 * 1024 * 1024) {
+          alert('Video file size must be less than 8MB.');
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append('title', $('#promo-title').val().trim());
+        formData.append('description', $('#promo-desc').val().trim());
+        formData.append('caption_text', $('#promo-captions').val().trim());
+        formData.append('video', file);
+
+        const btn = $('#btn-submit-promo');
+        btn.prop('disabled', true);
+        $('#promo-spinner').removeClass('hidden');
+
+        API.upload('/promos', formData, 'POST')
+          .done(function () {
+            Components.showToast('Video promo uploaded successfully!', 'success');
+            $('#upload-modal').addClass('hidden');
+            loadPromos();
+          })
+          .fail(function (xhr) {
+            const msg = (xhr.responseJSON && xhr.responseJSON.message) || 'Failed to upload video promo.';
+            Components.showToast(msg, 'error');
+          })
+          .always(function () {
+            btn.prop('disabled', false);
+            $('#promo-spinner').addClass('hidden');
+          });
+      });
+
+      // RBAC: Admin delete promo
+      $(document).on('click', '.btn-delete-promo', function () {
+        const id = $(this).data('id');
+        if (confirm('Are you sure you want to delete this video promo?')) {
+          API.delete(`/promos/${id}`)
+            .done(function () {
+              Components.showToast('Promo deleted', 'success');
+              loadPromos();
+            })
+            .fail(function () {
+              Components.showToast('Failed to delete promo', 'error');
+            });
+        }
+      });
+
+      // RBAC: Admin publish / unpublish toggle
+      $(document).on('click', '.btn-toggle-publish', function () {
+        const id = $(this).data('id');
+        const isPublished = $(this).data('published') === true || $(this).data('published') === 'true';
+        const action = isPublished ? 'unpublish' : 'publish';
+
+        API.patch(`/promos/${id}/${action}`)
+          .done(function () {
+            Components.showToast(`Promo ${action}ed successfully`, 'success');
+            loadPromos();
+          })
+          .fail(function () {
+            Components.showToast(`Failed to ${action} promo`, 'error');
+          });
+      });
+
+      // Fallback demo promos
+      function renderFallbackPromos() {
+        allPromos = [
+          {
+            id: 'demo-p1',
+            title: 'City Green Space & Waterfront Initiative',
+            description: 'Discover how Civic Hills is transforming unused waterfront corridors into accessible urban parks and bike paths.',
+            caption_text: 'Welcome to the Civic Hills Green Space Initiative. Over the next year, our parks department is restoring over 20 kilometers of public waterfront trails, creating clean, safe, and family-friendly outdoor spaces.',
+            published: true,
+            video_url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4'
+          },
+          {
+            id: 'demo-p2',
+            title: 'Civic Recycling & Sustainability Program',
+            description: 'Learn about our expanded municipal recycling schedules and zero-waste community sorting hubs.',
+            caption_text: 'Starting this month, Civic Hills introduces dedicated electronic waste collection and comprehensive residential composting. Together, we can reach our 50 percent waste reduction goal.',
+            published: true,
+            video_url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4'
+          },
+          {
+            id: 'demo-p3',
+            title: 'Downtown Arts & Cultural Festival Highlights',
+            description: 'Recap the lively performances, local food artisans, and cultural celebrations from this year’s festival.',
+            caption_text: 'The 2026 Downtown Arts Festival brought together over fifteen thousand residents, forty local musical performers, and dozens of civic workshops.',
+            published: true,
+            video_url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4'
+          }
+        ];
+        renderPromos(allPromos);
+      }
+    });
+  </script>
+</body>
+</html>
