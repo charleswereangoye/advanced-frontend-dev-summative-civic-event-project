@@ -35,251 +35,192 @@
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body class="bg-[#F8FAFC] text-[#0F172A] font-sans min-h-screen flex">
+<body class="bg-[#F8FAFC] text-[#0F172A] font-sans min-h-screen flex flex-col justify-between">
 
-  <!-- Toast notification container -->
-  <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-3"></div>
+  <!-- Navbar Placeholder (Consistent Horizontal Navigation) -->
+  <div id="navbar-placeholder"></div>
 
-  <!-- Left Sidebar (Strictly matching Figma Frame #1:1204 - 248px width) -->
-  <aside class="w-64 bg-white border-r border-slate-200 min-h-screen flex flex-col justify-between shrink-0 hidden md:flex sticky top-0 h-screen">
-    <div class="p-6">
-      
-      <!-- Brand Logo -->
-      <a href="index.html" class="flex items-center gap-2.5 mb-8">
-        <img src="assets/logo.svg" alt="CivicEvents+ Logo" class="w-6 h-6">
-        <span class="text-xl font-bold tracking-tight text-slate-900">CivicEvents+</span>
-      </a>
-
-      <!-- Sidebar Navigation Menu -->
-      <nav class="space-y-1 text-sm font-medium">
-        <a href="dashboard.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-blue-50 text-blue-600 font-semibold transition">
-          <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
-          Dashboard
-        </a>
-
-        <a href="index.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:text-blue-600 hover:bg-slate-50 transition">
-          <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-          Events Directory
-        </a>
-
-        <a href="#users-section" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:text-blue-600 hover:bg-slate-50 transition">
-          <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-          Users Management
-        </a>
-
-        <a href="announcements.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:text-blue-600 hover:bg-slate-50 transition">
-          <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 100-6 3 3 0 000 6z"></path></svg>
-          Audio Announcements
-        </a>
-
-        <a href="promos.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:text-blue-600 hover:bg-slate-50 transition">
-          <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-          Video Promos
-        </a>
-
-        <button id="sidebar-notifications-btn" class="w-full text-left flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-600 hover:text-blue-600 hover:bg-slate-50 transition cursor-pointer">
-          <span class="flex items-center gap-3">
-            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
-            Notifications
-          </span>
-          <span id="sidebar-unread-badge" class="hidden px-2 py-0.5 text-[10px] font-bold bg-blue-100 text-blue-700 rounded-full">0</span>
-        </button>
-      </nav>
-    </div>
-
-    <!-- Admin Profile / Logout -->
-    <div class="p-4 border-t border-slate-100">
-      <div class="flex items-center gap-3 p-2 rounded-xl bg-slate-50 border border-slate-200">
-        <div class="w-9 h-9 rounded-full bg-purple-600 text-white font-bold text-xs flex items-center justify-center shrink-0" id="admin-avatar">
-          AD
-        </div>
-        <div class="min-w-0 flex-1">
-          <p class="text-xs font-bold text-slate-900 truncate" id="admin-name">Admin User</p>
-          <p class="text-[11px] text-purple-700 font-semibold uppercase tracking-wider">Administrator</p>
-        </div>
-        <button id="btn-admin-logout" class="p-1.5 text-slate-400 hover:text-red-600 transition" title="Sign out">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-        </button>
-      </div>
-    </div>
-  </aside>
-
-  <!-- Main Dashboard Content -->
-  <div class="flex-1 min-w-0 flex flex-col">
+  <!-- Main Container -->
+  <main class="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-10 space-y-8">
     
-    <!-- Top Mobile Header -->
-    <div class="md:hidden bg-white border-b border-slate-200 p-4 flex items-center justify-between">
-      <a href="index.html" class="flex items-center gap-2">
-        <img src="assets/logo.svg" alt="Logo" class="w-5 h-5">
-        <span class="font-bold text-slate-900 text-base">CivicEvents+ Admin</span>
-      </a>
-      <a href="index.html" class="text-xs font-semibold text-blue-600">Back to Portal</a>
+    <!-- Breadcrumb -->
+    <nav class="flex items-center gap-2 text-xs font-medium text-slate-500">
+      <a href="index.html" class="hover:text-blue-600 transition">Home</a>
+      <span>/</span>
+      <span class="text-slate-800 font-semibold">Admin Dashboard</span>
+    </nav>
+
+    <!-- Welcome Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+      <div>
+        <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Admin Overview &amp; Analytics</h1>
+        <p class="text-sm text-slate-500 mt-1">Live municipal engagement, service statistics, and citizen activity across Civic Hills.</p>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <span class="text-xs font-semibold px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-slate-600 shadow-2xs" id="current-date-badge">
+          Today
+        </span>
+        <a href="index.html" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl transition">
+          Exit to Portal &rarr;
+        </a>
+      </div>
     </div>
 
-    <!-- Dashboard Content Body -->
-    <main class="flex-1 p-6 md:p-10 max-w-7xl w-full mx-auto space-y-8">
+    <!-- 4 Summary Metric Cards (Matching Figma specs) -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
       
-      <!-- Welcome Header -->
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 class="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">Welcome, Admin</h1>
-          <p class="text-sm text-slate-500 mt-1">Here's an overview of municipal engagement and citizen activity across Civic Hills today.</p>
-        </div>
-
-        <div class="flex items-center gap-3">
-          <span class="text-xs font-semibold px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-slate-600 shadow-2xs" id="current-date-badge">
-            Today
+      <!-- Total Events -->
+      <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-2">
+        <div class="flex items-center justify-between text-slate-400">
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Total Events</span>
+          <span class="p-2 bg-blue-50 text-blue-600 rounded-xl">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
           </span>
-          <a href="index.html" class="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl transition">
-            Exit to Portal &rarr;
-          </a>
+        </div>
+        <div class="text-3xl font-extrabold text-slate-900" id="stat-events-total">0</div>
+        <p class="text-xs text-blue-600 font-semibold" id="stat-events-sub">0 Upcoming Events</p>
+      </div>
+
+      <!-- Total Users -->
+      <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-2">
+        <div class="flex items-center justify-between text-slate-400">
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Registered Users</span>
+          <span class="p-2 bg-emerald-50 text-emerald-600 rounded-xl">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+          </span>
+        </div>
+        <div class="text-3xl font-extrabold text-slate-900" id="stat-users-total">0</div>
+        <p class="text-xs text-emerald-600 font-semibold" id="stat-users-sub">0 Active · 0 Disabled</p>
+      </div>
+
+      <!-- Registrations -->
+      <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-2">
+        <div class="flex items-center justify-between text-slate-400">
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Total Registrations</span>
+          <span class="p-2 bg-purple-50 text-purple-600 rounded-xl">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+          </span>
+        </div>
+        <div class="text-3xl font-extrabold text-slate-900" id="stat-reg-total">0</div>
+        <p class="text-xs text-purple-600 font-semibold">Citizen Event Attendance</p>
+      </div>
+
+      <!-- Audio & Video Content -->
+      <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-2">
+        <div class="flex items-center justify-between text-slate-400">
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Audio &amp; Promos</span>
+          <span class="p-2 bg-amber-50 text-amber-600 rounded-xl">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+          </span>
+        </div>
+        <div class="text-3xl font-extrabold text-slate-900" id="stat-media-total">0</div>
+        <p class="text-xs text-amber-600 font-semibold">Published Broadcasts</p>
+      </div>
+
+    </div>
+
+    <!-- Chart Section: 6-Month User Growth Trend (Chart.js) -->
+    <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <h2 class="text-lg font-bold text-slate-900">User Registrations Growth</h2>
+          <p class="text-xs text-slate-500">Last 6 months citizen registration visual trend</p>
+        </div>
+
+        <!-- Chart Type Switcher -->
+        <div class="flex items-center gap-1 bg-slate-50 p-1 rounded-xl border border-slate-200 text-xs font-medium">
+          <button id="chart-btn-line" class="px-3 py-1 rounded-lg bg-blue-600 text-white font-semibold transition cursor-pointer">
+            Line
+          </button>
+          <button id="chart-btn-bar" class="px-3 py-1 rounded-lg text-slate-600 hover:text-slate-900 transition cursor-pointer">
+            Bar
+          </button>
         </div>
       </div>
 
-      <!-- 4 Summary Metric Cards (Strictly matching Figma Frame #1:1204) -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        
-        <!-- Total Events -->
-        <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-2">
-          <div class="flex items-center justify-between text-slate-400">
-            <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Total Events</span>
-            <span class="p-2 bg-blue-50 text-blue-600 rounded-xl">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-            </span>
-          </div>
-          <div class="text-3xl font-extrabold text-slate-900" id="stat-events-total">0</div>
-          <p class="text-xs text-blue-600 font-semibold" id="stat-events-sub">0 Upcoming Events</p>
+      <!-- Chart Canvas Wrapper -->
+      <div class="relative w-full h-72">
+        <canvas id="growthChart"></canvas>
+      </div>
+    </div>
+
+    <!-- User Management Table Section -->
+    <div id="users-section" class="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-5">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <h2 class="text-lg font-bold text-slate-900">User Management</h2>
+          <p class="text-xs text-slate-500 mt-0.5">Manage citizen accounts, oversight, and activation status.</p>
         </div>
 
-        <!-- Total Users -->
-        <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-2">
-          <div class="flex items-center justify-between text-slate-400">
-            <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Registered Users</span>
-            <span class="p-2 bg-emerald-50 text-emerald-600 rounded-xl">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-            </span>
-          </div>
-          <div class="text-3xl font-extrabold text-slate-900" id="stat-users-total">0</div>
-          <p class="text-xs text-emerald-600 font-semibold" id="stat-users-sub">0 Active · 0 Disabled</p>
-        </div>
-
-        <!-- Registrations -->
-        <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-2">
-          <div class="flex items-center justify-between text-slate-400">
-            <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Total Registrations</span>
-            <span class="p-2 bg-purple-50 text-purple-600 rounded-xl">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
-            </span>
-          </div>
-          <div class="text-3xl font-extrabold text-slate-900" id="stat-reg-total">0</div>
-          <p class="text-xs text-purple-600 font-semibold" id="stat-reg-sub">Citizen Event Attendance</p>
-        </div>
-
-        <!-- Media & Announcements -->
-        <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-2">
-          <div class="flex items-center justify-between text-slate-400">
-            <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Audio &amp; Promos</span>
-            <span class="p-2 bg-amber-50 text-amber-600 rounded-xl">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-            </span>
-          </div>
-          <div class="text-3xl font-extrabold text-slate-900" id="stat-media-total">0</div>
-          <p class="text-xs text-amber-600 font-semibold" id="stat-media-sub">Published Broadcasts</p>
+        <!-- Role changes disabled to protect user permissions -->
+        <div class="text-[11px] font-semibold text-slate-400 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-xl">
+          Policy: Role changes disabled via UI
         </div>
       </div>
 
-      <!-- 6-Month User Growth Analytics Chart (Figma Frame #1:1204) -->
-      <div class="bg-white border border-slate-200 rounded-2xl p-6 md:p-8 shadow-xs space-y-6">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h2 class="text-lg font-bold text-slate-900">User Registrations Growth</h2>
-            <p class="text-xs text-slate-500 mt-0.5">Last 6 months citizen registration visual trend</p>
-          </div>
-
-          <div class="flex items-center gap-2">
-            <button id="chart-btn-line" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-blue-600 text-white shadow-2xs transition">Line</button>
-            <button id="chart-btn-bar" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition">Bar</button>
-          </div>
+      <!-- Filter bar -->
+      <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
+        <div class="sm:col-span-6 relative">
+          <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+          </span>
+          <input 
+            type="text" 
+            id="user-search" 
+            placeholder="Filter users by name or email..." 
+            class="w-full pl-9 pr-4 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600 transition"
+          >
         </div>
 
-        <div class="h-72 w-full relative">
-          <canvas id="growthChart"></canvas>
-        </div>
-      </div>
-
-      <!-- User Management Section (Strictly matching Figma Frame #1:1204) -->
-      <div id="users-section" class="bg-white border border-slate-200 rounded-2xl p-6 md:p-8 shadow-xs space-y-6">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h2 class="text-lg font-bold text-slate-900">User Management</h2>
-            <p class="text-xs text-slate-500 mt-0.5">Manage citizen accounts, oversight, and activation status.</p>
-          </div>
-
-          <!-- Role changes disabled to protect user permissions -->
-          <div class="text-[11px] font-semibold text-slate-400 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-xl">
-            Policy: Role changes disabled via UI
-          </div>
+        <div class="sm:col-span-3">
+          <select id="user-role-filter" class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600 transition">
+            <option value="all">All Roles</option>
+            <option value="user">User (Citizen)</option>
+            <option value="admin">Administrator</option>
+          </select>
         </div>
 
-        <!-- Filter bar -->
-        <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
-          <div class="sm:col-span-6 relative">
-            <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-            </span>
-            <input 
-              type="text" 
-              id="user-search" 
-              placeholder="Filter users by name or email..." 
-              class="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600 transition"
-            >
-          </div>
-
-          <div class="sm:col-span-3">
-            <select id="user-role-filter" class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600 transition">
-              <option value="all">All Roles</option>
-              <option value="admin">Admin</option>
-              <option value="user">User</option>
-            </select>
-          </div>
-
-          <div class="sm:col-span-3">
-            <select id="user-status-filter" class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600 transition">
-              <option value="all">All Status</option>
-              <option value="active">Active</option>
-              <option value="disabled">Disabled</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Users Table -->
-        <div class="overflow-x-auto rounded-xl border border-slate-200">
-          <table class="w-full text-left text-xs">
-            <thead class="bg-slate-50 text-slate-500 font-semibold uppercase tracking-wider border-b border-slate-200">
-              <tr>
-                <th class="py-3 px-4">User Name</th>
-                <th class="py-3 px-4">Email Address</th>
-                <th class="py-3 px-4">Role</th>
-                <th class="py-3 px-4">Status</th>
-                <th class="py-3 px-4 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody id="users-table-body" class="divide-y divide-slate-100 font-medium">
-              <tr>
-                <td colspan="5" class="py-8 text-center text-slate-400">Loading citizen accounts...</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <!-- Users Table Footer -->
-        <div class="flex items-center justify-between text-xs text-slate-500 pt-2">
-          <span id="users-count-summary">Showing users</span>
-          <span class="text-[11px] text-slate-400">Use toggle buttons to enable or disable accounts</span>
+        <div class="sm:col-span-3">
+          <select id="user-status-filter" class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600 transition">
+            <option value="all">All Status</option>
+            <option value="active">Active Only</option>
+            <option value="disabled">Disabled Only</option>
+          </select>
         </div>
       </div>
-    </main>
-  </div>
+
+      <!-- User List Table -->
+      <div class="overflow-x-auto border border-slate-100 rounded-xl">
+        <table class="w-full text-left text-xs text-slate-700">
+          <thead class="bg-slate-50 text-[11px] font-bold uppercase tracking-wider text-slate-500 border-b border-slate-200">
+            <tr>
+              <th class="py-3 px-4">User Name</th>
+              <th class="py-3 px-4">Email Address</th>
+              <th class="py-3 px-4">Role</th>
+              <th class="py-3 px-4">Status</th>
+              <th class="py-3 px-4 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="users-table-body" class="divide-y divide-slate-100">
+            <tr>
+              <td colspan="5" class="py-6 text-center text-slate-400">Loading user accounts...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Users Table Footer -->
+      <div class="flex items-center justify-between text-xs text-slate-500 pt-2">
+        <span id="users-count-summary">Showing users</span>
+        <span class="text-[11px] text-slate-400">Use toggle buttons to enable or disable accounts</span>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer Placeholder -->
+  <div id="footer-placeholder"></div>
 
   <!-- Scripts -->
   <script src="js/config.js"></script>
@@ -298,31 +239,13 @@
         return;
       }
 
-      // Initialize notifications drawer
-      Components.renderDrawer();
-
-      // Set admin profile in sidebar
-      const currentAdmin = Auth.getUser();
-      if (currentAdmin) {
-        $('#admin-name').text(currentAdmin.full_name || 'Admin User');
-        const initials = (currentAdmin.full_name || 'AD').split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
-        $('#admin-avatar').text(initials);
-      }
+      // Render standard top navbar & footer
+      Components.renderNavbar('dashboard');
+      Components.renderFooter();
 
       // Date badge
       const today = new Date().toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
       $('#current-date-badge').text(today);
-
-      // Logout handler
-      $('#btn-admin-logout').on('click', function () {
-        Auth.logout();
-      });
-
-      // Notification drawer button
-      $('#sidebar-notifications-btn').on('click', function () {
-        $('#notification-drawer-wrapper').removeClass('hidden');
-        Components.loadNotifications();
-      });
 
       let allUsers = [];
       let chartInstance = null;
